@@ -1,4 +1,47 @@
-#:kivy language declaration
+<MainWindow>:
+    name: "main"
+    
+    AnchorLayout:
+        anchor_x: 'right'
+        anchor_y: 'top'
+        
+        Button:
+            text: "p"
+            size_hint: .1, .1
+        Button:
+            text: "s"
+            size_hint: .1, .1
+    
+    FloatLayout:
+        size: root.width, root.height/2
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size: root.width, root.height/2
+            
+            BoxLayout:
+                orientation: 'vertical'
+            
+                Label:
+                    text: 't1'
+                    size_hint: 0.2, 0.2
+                TextInput:
+                    size_hint: 0.1, 0.1
+                    id: t0
+                    font_size: (root.width**2 + root.height**3) / 14**2
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: 't2'
+                    size_hint: 0.2, 0.2
+                TextInput:
+                    size_hint: 0.1, 0.1
+                    id: t0
+                    font_size: (root.width**2 + root.height**3) / 14**2
 
-Button:
-    text: 'blabla'
+
+<Settings>:
+    name: "settings"
+    
+<Plots>:
+    name: "plots"
