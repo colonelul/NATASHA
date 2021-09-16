@@ -1,21 +1,33 @@
 import ast
+from defaultFile import DefaultFile
 
 class CacheFile:
     def __init__(self):
-        print("~~~~~Cache file~~~~~")
+        self.file = None
+        self.load()
     
-    def import_file(self, val_plastic):
-        dictionary_cc_in = []
-        self.index_dict_cache = 0
+    def load(self):
         
-        self.input_file = open('natasha_cache.txt', 'r')
-        self.cache_in = self.input_file.readlines()
+        try:
+            self.file = open('natasha_cache.txt', 'r')
+            self.cache_in = self.file.readlines()
+            self.file.close()
+            
+        except:
+            print("Open ~DataFile~ not working! -> Create a file by default")
+            
+            #creare fisier daca acesta nu exista
+            self.cache_in = self.create_file()
+        
+        self.add(self.cache_in)
+    
+    def add(self, cache_in):
+        dictionary_cc_in = []
         
         for i in self.cache_in:
             dictionary_cc_in.append(ast.literal_eval(i))
         
         self.dictionary_cache = dictionary_cc_in[0]
-        self.input_file.close()
         
         if self.dictionary_cache[3]['PET'] == 1:
             self.index_dict_cache = 0
@@ -42,10 +54,21 @@ class CacheFile:
         #     temp_out_12.insert(tk.END, dictionary_cache[index_dict_cache]['12'])
         #     temp_out_13.insert(tk.END, dictionary_cache[index_dict_cache]['13'])
         # =============================================================================
-            
+    
     def export_file(self, dictionary_cache):
-        file = open('natasha_cache.txt', 'w')
-        file.write(str(self.dictionary_cache))
-        file.close()
+        self.file = open('natasha_cache.txt', 'w')
+        self.file.write(str(dictionary_cache))
+        self.file.close()
+    
+    def create_file(self):
+        self.file = open('natasha_cache.txt', 'w')
+        dictionary_cache = DefaultFile.add_data()
+        self.file.write(str(dictionary_cache))
         
+        cache = self.file.readlines()
+        self.file.close()
         
+        return cache
+    
+test = CacheFile()
+

@@ -15,7 +15,7 @@ class MainWindow(Screen):
 
 class Settings(Screen):
     print("settings")
-    
+
 class Plots(Screen):
     print("plots")
     
