@@ -9,9 +9,21 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from DataFile import CacheFile
+from kivy.config import Config
+from kivy.clock import Clock
+from time import strftime
+
+Config.set('graphics', 'width', '1080')
+Config.set('graphics', 'height', '720')
 
 class MainWindow(Screen):
-    print("da")
+    
+    def update_time(self, cok):
+        self.root.ids.time.text = strftime('[b]%H[/b]:%M:%S')
+        
+    def on_start(self):
+        print("da")
+        Clock.schedule_interval(self.update_time, 0)
 
 class Settings(Screen):
     print("settings")
