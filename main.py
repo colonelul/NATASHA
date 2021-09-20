@@ -39,8 +39,6 @@ class MainWindow(Screen):
         self.arr_temp = None
         self.arr_rpm = None
         self.serial_start()
-        data_file_object = ImportFile()
-        self.import_file = ImportFile.load(data_file_object)
         self._temperatures_widget()
         #self.on_start()
     
@@ -61,7 +59,6 @@ class MainWindow(Screen):
         
     def second_thread(self):
         self.update_label_text()
-        
         
     
     @mainthread
@@ -91,9 +88,9 @@ class MainWindow(Screen):
             self.ids[key + "-text"] = text
             self.tempContainer.add_widget(text)
             
-        self.change_text(self.name_temp)
+        self.change_text_on_start()
         
-    def separate_date(self):
+    def separate_date_serial(self):
         data_received = SerialConnection.get_data()
         if len(data_received) > 0:
             try:
@@ -112,12 +109,15 @@ class MainWindow(Screen):
             
         return self.arr_temp
             
-    def change_text(self, text_input):
+    def change_text_on_start(self):
+        data_file_object = ImportFile()
+        import_file = ImportFile.load(data_file_object)
+        
         for key in self.name_temp:
             if key == "Duza": 
-                self.ids.key.text = text_input[int('d')]
+                self.ids[key + "-lab"].text = str(import_file['duza'])
             else:
-                self.ids.key.text = text_input[int(key)]
+                self.ids[key + "-lab"].text = str(import_file[key])
     
 class Settings(Screen):
     print("settings")
