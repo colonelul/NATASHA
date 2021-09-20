@@ -1,7 +1,7 @@
 import ast
 from defaultFile import DefaultFile
 
-class CacheFile:
+class ImportFile:
     def __init__(self):
         self.file = None
         self.load()
@@ -17,9 +17,10 @@ class CacheFile:
             print("Open ~DataFile~ not working! -> Create a file by default")
             
             #creare fisier daca acesta nu exista
-            self.cache_in = self.create_file()
+            self.cache_in = self.CreateFile.create_file()
         
-        self.add(self.cache_in)
+        ex = self.add(self.cache_in)
+        return ex
     
     def add(self, cache_in):
         dictionary_cc_in = []
@@ -30,21 +31,36 @@ class CacheFile:
         self.dictionary_cache = dictionary_cc_in[0]
         
         if self.dictionary_cache[3]['PET'] == 1:
-            self.index_dict_cache = 0
-            #!!meniu prima varianta PET
-            #variable_plastic.set(options_plastic[0])
+            index_dict_cache = 0
+            self.dictionary_cache = self.dictionary_cache[0]
+            
         elif self.dictionary_cache[3]['HDPE'] == 1:
-            self.index_dict_cache = 1
+            index_dict_cache = 1
+            self.dictionary_cache = self.dictionary_cache[1]
             
         elif self.dictionary_cache[3]['PP'] == 1:
-            self.index_dict_cache = 2
-            #!!meniu prima varianta PP
+            index_dict_cache = 2
+            self.dictionary_cache = self.dictionary_cache[2]
+        else:
+            index_dict_cache = 0
+            self.dictionary_cache = self.dictionary_cache[0]
+
+        return self.dictionary_cache
+            
             
     def export_file(self, dictionary_cache):
         self.file = open('natasha_cache.txt', 'w')
         self.file.write(str(dictionary_cache))
         self.file.close()
     
+    
+class ExportFile:
+    def export_file(self, dictionary_cache):
+        self.file = open('natasha_cache.txt', 'w')
+        self.file.write(str(dictionary_cache))
+        self.file.close()
+    
+class CreateFile:
     def create_file(self):
         self.file = open('natasha_cache.txt', 'w')
         dictionary_cache = DefaultFile.add_data()
@@ -54,6 +70,3 @@ class CacheFile:
         self.file.close()
         
         return cache
-    
-test = CacheFile()
-

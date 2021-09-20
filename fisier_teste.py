@@ -1,109 +1,164 @@
+import threading
+import time
+
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.core.window import Window
-from kivy.uix.vkeyboard import VKeyboard
-from kivy.properties import ObjectProperty
-from kivy.uix.button import Button
-from functools import partial
-from kivy.config import Config
-from kivy.uix.screenmanager import Screen, ScreenManager
-from kivy import require
-
-# This example uses features introduced in Kivy 1.8.0, namely being able
-# to load custom json files from the app folder.
-require("1.8.0")
-
-Builder.load_string('''
-<KeyboardScreen>:
-    displayLabel: displayLabel
-    kbContainer: kbContainer
-    BoxLayout:
-        orientation: 'vertical'
-        Label:
-            size_hint_y: 0.15
-            text: "Available Keyboard Layouts"
-        BoxLayout:
-            id: kbContainer
-            size_hint_y: 0.2
-            orientation: "horizontal"
-            padding: 10
-        Label:
-            id: displayLabel
-            size_hint_y: 0.15
-            markup: True
-            text: "[b]Key pressed[/b] - None"
-            halign: "center"
-        Widget:
-            # Just a space taker to allow for the popup keyboard
-            size_hint_y: 0.5
-
-''')
-
-class KeyboardScreen(Screen):
-    """
-    Screen containing all the available keyboard layouts. Clicking the buttons
-    switches to these layouts.
-    """
-    displayLabel = ObjectProperty()
-    kbContainer = ObjectProperty()
-
-    def __init__(self, **kwargs):
-        super(KeyboardScreen, self).__init__(**kwargs)
-        self._add_keyboards()
-        self._keyboard = None
-
-    def _add_keyboards(self):
-        """ Add a buttons for each available keyboard layout. When clicked,
-        the buttons will change the keyboard layout to the one selected. """
-        # Add the file in our app directory, the .json extension is required.
-        layouts= "numeric_keyboard.json"
-        self.kbContainer.add_widget(Button(text="key", on_release=partial(self.set_layout, layouts)))
-
-    def set_layout(self, layout, button):
-        """ Change the keyboard layout to the one specified by *layout*. """
-        kb = Window.request_keyboard(
-            self._keyboard_close, self)
-        if kb.widget:
-            # If the current configuration supports Virtual Keyboards, this
-            # widget will be a kivy.uix.vkeyboard.VKeyboard instance.
-            self._keyboard = kb.widget
-            self._keyboard.layout = layout
-        else:
-            self._keyboard = kb
-
-        self._keyboard.bind(on_key_down=self.key_down,
-                            on_key_up=self.key_up)
-
-    def _keyboard_close(self, *args):
-        """ The active keyboard is being closed. """
-        if self._keyboard:
-            self._keyboard.unbind(on_key_down=self.key_down)
-            self._keyboard.unbind(on_key_up=self.key_up)
-            self._keyboard = None
-
-    def key_down(self, keyboard, keycode, text, modifiers):
-        """ The callback function that catches keyboard events. """
-        self.displayLabel.text = u"Key pressed - {0}".format(text)
-
-    # def key_up(self, keyboard, keycode):
-    def key_up(self, keyboard, keycode, *args):
-        """ The callback function that catches keyboard events. """
-        # system keyboard keycode: (122, 'z')
-        # dock keyboard keycode: 'z'
-        if isinstance(keycode, tuple):
-            keycode = keycode[1]
-        self.displayLabel.text += u" (up {0})".format(keycode)
+from kivy.factory import Factory
+from kivy.animation import Animation
+from kivy.clock import Clock, mainthread
+from kivy.uix.gridlayout import GridLayout
 
 
-class KeyboardDemo(App):
-    sm = None  # The root screen manager
+Builder.load_string("""
+<AnimWidget@Widget>:
+    canvas:
+        Color:
+            rgba: 0.7, 0.3, 0.9, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    size_hint: None, None
+    size: 400, 30
+
+
+<RootWidget>:
+    cols: 1
+
+    canvas:
+        Color:
+            rgba: 0.9, 0.9, 0.9, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    anim_box: anim_box
+    but_1: but_1
+    lab_1: lab_1
+    lab_2: lab_2
+
+    Button:
+        id: but_1
+        font_size: 20
+        text: 'Start second thread'
+        on_press: root.start_second_thread(lab_2.text)
+
+    Label:
+        id: lab_1
+        font_size: 30
+        color: 0.6, 0.6, 0.6, 1
+        text_size: self.width, None
+        halign: 'center'
+
+    AnchorLayout:
+        id: anim_box
+
+    Label:
+        id: lab_2
+        font_size: 100
+        color: 0.8, 0, 0, 1
+        text: '3'
+""")
+
+
+class RootWidget(GridLayout):
+
+    stop = threading.Event()
+
+    def start_second_thread(self, l_text):
+        threading.Thread(target=self.second_thread, args=(l_text,)).start()
+
+    def second_thread(self, label_text):
+        # Remove a widget, update a widget property, create a new widget,
+        # add it and animate it in the main thread by scheduling a function
+        # call with Clock.
+        Clock.schedule_once(self.start_test, 0)
+
+        # Do some thread blocking operations.
+        time.sleep(5)
+        l_text = str(int(label_text) * 3000)
+
+        # Update a widget property in the main thread by decorating the
+        # called function with @mainthread.
+        self.update_label_text(l_text)
+
+        # Do some more blocking operations.
+        time.sleep(2)
+
+        # Remove some widgets and update some properties in the main thread
+        # by decorating the called function with @mainthread.
+        self.stop_test()
+
+        # Start a new thread with an infinite loop and stop the current one.
+        threading.Thread(target=self.infinite_loop).start()
+
+    def start_test(self, *args):
+        # Remove the button.
+        self.remove_widget(self.but_1)
+
+        # Update a widget property.
+        self.lab_1.text = ('The UI remains responsive while the '
+                           'second thread is running.')
+
+        # Create and add a new widget.
+        anim_bar = Factory.AnimWidget()
+        self.anim_box.add_widget(anim_bar)
+
+        # Animate the added widget.
+        anim = Animation(opacity=0.3, width=100, duration=0.6)
+        anim += Animation(opacity=1, width=400, duration=0.8)
+        anim.repeat = True
+        anim.start(anim_bar)
+
+    @mainthread
+    def update_label_text(self, new_text):
+        self.lab_2.text = new_text
+
+    @mainthread
+    def stop_test(self):
+        self.lab_1.text = ('Second thread exited, a new thread has started. '
+                           'Close the app to exit the new thread and stop '
+                           'the main process.')
+
+        self.lab_2.text = str(int(self.lab_2.text) + 1)
+
+        self.remove_widget(self.anim_box)
+
+    def infinite_loop(self):
+        iteration = 0
+        while True:
+            if self.stop.is_set():
+                # Stop running this thread so the main Python process can exit.
+                return
+            iteration += 1
+            print('Infinite loop, iteration {}.'.format(iteration))
+            time.sleep(1)
+
+
+class ThreadedApp(App):
+
+    def on_stop(self):
+        # The Kivy event loop is about to stop, set a stop signal;
+        # otherwise the app window will close, but the Python process will
+        # keep running until all secondary threads exit.
+        self.root.stop.set()
 
     def build(self):
-        self.sm = ScreenManager()
-        self.sm.add_widget(KeyboardScreen(name="keyboard"))
-        self.sm.current = "keyboard"
-        return self.sm
+        return RootWidget()
 
+if __name__ == '__main__':
+    ThreadedApp().run()
+    
+    
+name_temp = ["Duza", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9"]
 
-if __name__ == "__main__":
-    KeyboardDemo().run()
+for key in name_temp:
+    if key == "Duza":
+        print("da")
+    
+    
+    
+    
+    
+    
+    
+    
