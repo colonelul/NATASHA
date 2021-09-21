@@ -10,10 +10,13 @@ class SerialConnection:
             '''~~Comunicare Serial pentru PC~~
                  serial_object.port = 'COM?' -> ?: numarul portului de comunicare'''
             
+            print("Trying to connect(PC)")
+            
             with serial.Serial() as self.serial_object:
-                self.serial_object = 9600
-                self.serial_object.port = 'COM1' #selectare port 
+                self.serial_object.boudrate = 9600
+                self.serial_object.port = 'COM26' #selectare port 
                 self.serial_object.open()
+            
         except:
             '''comunicare Serial pentru RASPBERRY'''
             
@@ -29,15 +32,17 @@ class SerialConnection:
                     print("Failed to connet on" + device)
         
     def get_data(self):
+        filter_data_decode = ""
         while(1):
             try:
                 filter_data = self.serial_object.readline()
-                self.filter_data_decode = filter_data.decode('utf-8')
+                filter_data_decode = filter_data.decode('utf-8')
             except:
-                pass
-            
-            print("DATA_RECEIVED-> " + self.filter_data_decode)
-            return self.filter_data_decode
+                print("Data received is NUll!")
+                
+            if filter_data_decode != "":
+                print("DATA_RECEIVED-> " + filter_data_decode)
+            return filter_data_decode
     
     def send(self, data):
         self.send_data = data

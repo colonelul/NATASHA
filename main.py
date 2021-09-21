@@ -5,6 +5,7 @@ Created on Wed Sep 15 11:18:48 2021
 @author: NeluColoNelu
 """
 import threading
+import time
 
 from kivy.app import App
 from kivy.lang import Builder
@@ -15,20 +16,16 @@ from kivy.clock import Clock, mainthread
 from time import strftime
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+from kivy.uix.behaviors.focus import FocusBehavior
 
 from serial import SerialConnection
 from SaveFile import ImportFile
+from keyboard import KeyboardScreen
 
 Config.set('graphics', 'width', '1080')
 Config.set('graphics', 'height', '720')
 
 kv_file = Builder.load_file("mainui.kv")
-
-class DragableObject:
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            touch.grab(self)
-            return True
 
 class MainWindow(Screen):
     name_temp = ["Duza", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9"]
@@ -38,44 +35,37 @@ class MainWindow(Screen):
         super(MainWindow, self).__init__(**kwargs)
         self.arr_temp = None
         self.arr_rpm = None
-        self.serial_start()
         self._temperatures_widget()
-        #self.on_start()
+        self.start_first_thread()
     
-    def serial_start(self):
-        serial = SerialConnection()
-    
-    def start_frist_thread(self):
+    def start_first_thread(self):
         threading.Thread(target=self.first_thread).start()
     
-    def start_second_thread(self):
-        threading.Thread(target=self.second_thread).start()
-    
     def first_thread(self):
-        val = self.separate_data() 
-        
-        self.update_label_text(val)
-        
-        
-    def second_thread(self):
-        self.update_label_text()
-        
+            # val = self.separate_data_serial() 
+            # self.update_label(val)
+        print("Thread")
+               
     
     @mainthread
-    def update_label_text(self, new_text):
-        self.change_text()
+    def update_label(self, txt):
+        self.change_text_label(txt)
         
-    
-    def update_time(self, cok):
+    def update_time(self):
         self.root.ids.time.text = strftime('[b]%H[/b]:%M:%S')
         
     def on_start(self):
-        Clock.schedule_interval(self.update_time, 0)
-    
+        Clock.schedule_interval(self.update_time(), 0)
+        
+    def on_focus(self, instance, value):
+        self.manager.current = 'keyboard'
+        if instance in self.ids.values():
+            print(list(self.ids.keys())[list(self.ids.values()).index(instance)])  
+
     def _temperatures_widget(self):
         
         for key in self.name_temp:
-            lab = Label(text=key + str('\u2103'))
+            lab = Label(text=key)
             self.tempContainer.add_widget(lab, 0)
             
         for key in self.name_temp:
@@ -87,11 +77,15 @@ class MainWindow(Screen):
             text = TextInput()
             self.ids[key + "-text"] = text
             self.tempContainer.add_widget(text)
+            text.bind(focus=self.on_focus)
+
             
-        self.change_text_on_start()
+        self.change_text_label(None)
         
-    def separate_date_serial(self):
-        data_received = SerialConnection.get_data()
+    def separate_data_serial(self):
+        dat_receiv = SerialConnection()
+        data_received = SerialConnection.get_data(dat_receiv)
+        
         if len(data_received) > 0:
             try:
                 if data_received[0] == 't':
@@ -109,16 +103,18 @@ class MainWindow(Screen):
             
         return self.arr_temp
             
-    def change_text_on_start(self):
-        data_file_object = ImportFile()
-        import_file = ImportFile.load(data_file_object)
+    def change_text_label(self, values):
         
+        if values == None:
+            data_file_object = ImportFile()
+            import_file = ImportFile.load(data_file_object)
+            
         for key in self.name_temp:
             if key == "Duza": 
                 self.ids[key + "-lab"].text = str(import_file['duza'])
             else:
                 self.ids[key + "-lab"].text = str(import_file[key])
-    
+        
 class Settings(Screen):
     print("settings")
 
@@ -130,11 +126,12 @@ class MainUiApp(App):
     
     def build(self):
         self.sm = ScreenManager()
-        self.sm.add_widget(MainWindow(name="mode"))
-        self.sm.add_widget(Settings(name="settings"))
-        self.sm.add_widget(Plots(name="plots"))
+        self.sm.add_widget(MainWindow(name='mode'))
+        self.sm.add_widget(Settings(name='settings'))
+        self.sm.add_widget(Plots(name='plots'))
+        self.sm.add_widget(KeyboardScreen(name='keyboard'))
         
-        self.sm.current = "mode"
+        self.sm.current = 'mode'
         return self.sm
 
 if __name__== '__main__':

@@ -22,8 +22,10 @@
                 row_default_height: 30
                 Button:
                     text: "p"
+                    on_release: root.manager.current = 'plots'
                 Button:
                     text: "s"
+                    on_release: root.manager.current = 'settings'
         
         BoxLayout:
             orientation: 'horizontal'
@@ -78,6 +80,14 @@
 
 <Settings>:
     name: "settings"
+    Button:
+        text: "Back"
+        size_hint_y: 0.1
+        on_release: root.manager.current = "mode"
     
 <Plots>:
     name: "plots"
+    Button:
+        text: "Back"
+        size_hint_y: 0.1
+        on_release: root.manager.current = "mode"
