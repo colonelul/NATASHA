@@ -27,23 +27,39 @@
                     text: "s"
                     on_release: root.manager.current = 'settings'
         
-        BoxLayout:
-            orientation: 'horizontal'
+        GridLayout:
+            cols: 2
         
-            BoxLayout:
-                orientation: 'vertical'
-                
-                BoxLayout:
-                    
-                    
-                
+            GridLayout:
+                cols: 1
                 BoxLayout:
                     orientation: 'horizontal'
                     
-                    Label:
-                        text: 'RECE'
-                    Label:
-                        text: 'CALD'
+                    BoxLayout:
+                        orientation: 'vertical'
+                        Label:
+                            text: 'Bazin apa rece'
+                        
+                        GridLayout:
+                            cols: 2
+                            Label:
+                                text: '0'
+                                id: T_rece_l
+                            TextInput:
+                                id: T_rece_t
+                    
+                    BoxLayout:
+                        orientation: 'vertical'
+                        Label:
+                            text: 'Bazin apa calda'
+                        
+                        GridLayout:
+                            cols: 2
+                            Label:
+                                text: '0'
+                                id: T_calda_l
+                            TextInput:
+                                id: T_calda_t   
         
                 BoxLayout:
                     height: 300
@@ -83,7 +99,7 @@
     Button:
         text: "Back"
         size_hint_y: 0.1
-        on_release: root.manager.current = "mode"
+        on_release: root.dada()
     
 <Plots>:
     name: "plots"

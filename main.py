@@ -16,7 +16,8 @@ from kivy.clock import Clock, mainthread
 from time import strftime
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-from kivy.uix.behaviors.focus import FocusBehavior
+#from kivy.uix.behaviors.focus import FocusBehavior
+from kivy.core.window import Window
 
 from serial import SerialConnection
 from SaveFile import ImportFile
@@ -57,10 +58,25 @@ class MainWindow(Screen):
     def on_start(self):
         Clock.schedule_interval(self.update_time(), 0)
         
+    ''' Traducerea valorilor din change_bob
+            Fiecare valoare are o temp MAXIMA
+            1 -> Duza, T1,...,T9 (0-230*C)
+            2 -> T11             (0-90*C)            
+    '''
+    
     def on_focus(self, instance, value):
         self.manager.current = 'keyboard'
+        KeyboardScreen()._add_keyboard()
+        
         if instance in self.ids.values():
-            print(list(self.ids.keys())[list(self.ids.values()).index(instance)])  
+            txt_focuses = list(self.ids.keys())[list(self.ids.values()).index(instance)]
+# =============================================================================
+#             for txt in self.name_temp:
+#                 if txt + "-text" == txt_focuses:
+#                     bob = KeyboardScreen()
+#                     change_bob = KeyboardScreen.change_lab(bob, '1')
+# =============================================================================
+            print(txt_focuses, value)  
 
     def _temperatures_widget(self):
         
@@ -116,10 +132,13 @@ class MainWindow(Screen):
                 self.ids[key + "-lab"].text = str(import_file[key])
         
 class Settings(Screen):
+    def dada(self):
+        self.manager.current = 'mode'
     print("settings")
 
 class Plots(Screen):
     print("plots")
+
 
 class MainUiApp(App):
     sm = None
@@ -133,6 +152,7 @@ class MainUiApp(App):
         
         self.sm.current = 'mode'
         return self.sm
+
 
 if __name__== '__main__':
     MainUiApp().run()
