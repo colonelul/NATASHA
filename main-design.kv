@@ -1,7 +1,5 @@
-
 <MainWindow>:
     name: "main"
-    
     tempContainer: tempContainer
     
     BoxLayout:
@@ -107,3 +105,35 @@
         text: "Back"
         size_hint_y: 0.1
         on_release: root.manager.current = "mode"
+
+<KeyboardScreen>:
+    name: "keyboard"
+    displayLabel: displayLabel
+    kbContainer: kbContainer
+    intr_temp: intr_temp
+    
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: intr_temp
+            size_hint_y: 0.15
+            text: "Introduceti o temperatura"
+        Button:
+            text: "Back"
+            size_hint_y: 0.1
+            on_release: 
+                root.daa()
+        BoxLayout:
+            id: kbContainer
+            size_hint_y: 0.2
+            orientation: "horizontal"
+            padding: 10
+        Label:
+            id: displayLabel
+            size_hint_y: 0.15
+            markup: True
+            text: "[b]Key pressed[/b] - None"
+            halign: "center"
+        Widget:
+            # Just a space taker to allow for the popup keyboard
+            size_hint_y: 0.5

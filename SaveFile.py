@@ -17,7 +17,7 @@ class ImportFile:
             print("Open ~DataFile~ not working! -> Create a file by default")
             
             #creare fisier daca acesta nu exista
-            self.cache_in = self.CreateFile.create_file()
+            CreateFile().create_file()
         
         ex = self.add(self.cache_in)
         return ex

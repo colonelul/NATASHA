@@ -24,9 +24,10 @@ from SaveFile import ImportFile
 from keyboard import KeyboardScreen
 
 Config.set('graphics', 'width', '1080')
-Config.set('graphics', 'height', '720')
+Config.set('graphics', 'height', '1024')
+Config.set('kivy', 'keyboard_mode', 'dock')
 
-kv_file = Builder.load_file("mainui.kv")
+kv_file = Builder.load_file("main-design.kv")
 
 class MainWindow(Screen):
     name_temp = ["Duza", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9"]
@@ -45,7 +46,7 @@ class MainWindow(Screen):
     def first_thread(self):
             # val = self.separate_data_serial() 
             # self.update_label(val)
-        print("Thread")
+        pass
                
     
     @mainthread
@@ -66,17 +67,14 @@ class MainWindow(Screen):
     
     def on_focus(self, instance, value):
         self.manager.current = 'keyboard'
-        KeyboardScreen()._add_keyboard()
-        
+        #KeyboardScreen()._add_keyboard()
         if instance in self.ids.values():
             txt_focuses = list(self.ids.keys())[list(self.ids.values()).index(instance)]
-# =============================================================================
-#             for txt in self.name_temp:
-#                 if txt + "-text" == txt_focuses:
-#                     bob = KeyboardScreen()
-#                     change_bob = KeyboardScreen.change_lab(bob, '1')
-# =============================================================================
-            print(txt_focuses, value)  
+            for txt in self.name_temp:
+                if txt + "-text" == txt_focuses:
+                    pass
+                    KeyboardScreen().change_lab('1')
+            print(txt_focuses, value)
 
     def _temperatures_widget(self):
         
@@ -99,8 +97,7 @@ class MainWindow(Screen):
         self.change_text_label(None)
         
     def separate_data_serial(self):
-        dat_receiv = SerialConnection()
-        data_received = SerialConnection.get_data(dat_receiv)
+        data_received = SerialConnection().get_data()
         
         if len(data_received) > 0:
             try:
@@ -134,11 +131,9 @@ class MainWindow(Screen):
 class Settings(Screen):
     def dada(self):
         self.manager.current = 'mode'
-    print("settings")
 
 class Plots(Screen):
-    print("plots")
-
+    pass
 
 class MainUiApp(App):
     sm = None
