@@ -16,16 +16,15 @@ from kivy.clock import Clock, mainthread
 from time import strftime
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-#from kivy.uix.behaviors.focus import FocusBehavior
-from kivy.core.window import Window
-
-from serial import SerialConnection
+from openSerial import SerialConnection
 from SaveFile import ImportFile
 from keyboard import KeyboardScreen
 
-Config.set('graphics', 'width', '1080')
+Config.set('graphics', 'width', '1280')
 Config.set('graphics', 'height', '1024')
 Config.set('kivy', 'keyboard_mode', 'dock')
+Config.write()
+
 
 kv_file = Builder.load_file("main-design.kv")
 
@@ -44,20 +43,16 @@ class MainWindow(Screen):
         threading.Thread(target=self.first_thread).start()
     
     def first_thread(self):
-            # val = self.separate_data_serial() 
-            # self.update_label(val)
-        pass
+        SerialConnection().__connect__()
+        Clock.schedule_interval(self.update_time(), 0)
                
-    
     @mainthread
     def update_label(self, txt):
         self.change_text_label(txt)
         
     def update_time(self):
-        self.root.ids.time.text = strftime('[b]%H[/b]:%M:%S')
-        
-    def on_start(self):
-        Clock.schedule_interval(self.update_time(), 0)
+        self.ids.time.text = '[b][color=#9e3898]'+'[size=80]'+strftime('%I:%M:%S')+'[/size]'+'[/color][/b]'
+
         
     ''' Traducerea valorilor din change_bob
             Fiecare valoare are o temp MAXIMA
@@ -67,15 +62,14 @@ class MainWindow(Screen):
     
     def on_focus(self, instance, value):
         self.manager.current = 'keyboard'
-        #KeyboardScreen()._add_keyboard()
         if instance in self.ids.values():
             txt_focuses = list(self.ids.keys())[list(self.ids.values()).index(instance)]
             for txt in self.name_temp:
                 if txt + "-text" == txt_focuses:
-                    pass
-                    KeyboardScreen().change_lab('1')
+                    self.manager.screens[3].ids.intr_temp.text = "Introduceti o temperatura cumprinsa intre valorile 0 - 320*C"
+                    self.manager.screens[0].ids.share_data = "heaters"
             print(txt_focuses, value)
-
+        
     def _temperatures_widget(self):
         
         for key in self.name_temp:
@@ -88,12 +82,14 @@ class MainWindow(Screen):
             self.tempContainer.add_widget(lab, 1)
             
         for key in self.name_temp:
-            text = TextInput()
+            text = TextInput(input_filter='float')
             self.ids[key + "-text"] = text
             self.tempContainer.add_widget(text)
             text.bind(focus=self.on_focus)
-
-            
+        
+        self.ids.amp.bind(focus=self.on_focus)
+        self.ids.calda_input.bind(focus=self.on_focus)
+    
         self.change_text_label(None)
         
     def separate_data_serial(self):
@@ -147,7 +143,6 @@ class MainUiApp(App):
         
         self.sm.current = 'mode'
         return self.sm
-
 
 if __name__== '__main__':
     MainUiApp().run()

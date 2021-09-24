@@ -1,4 +1,5 @@
 <MainWindow>:
+    id: share_data
     name: "main"
     tempContainer: tempContainer
     
@@ -42,9 +43,10 @@
                             cols: 2
                             Label:
                                 text: '0'
-                                id: T_rece_l
+                                id: rece_label
                             TextInput:
-                                id: T_rece_t
+                                id: rece_input
+                                input_filter: 'float'
                     
                     BoxLayout:
                         orientation: 'vertical'
@@ -55,9 +57,10 @@
                             cols: 2
                             Label:
                                 text: '0'
-                                id: T_calda_l
+                                id: calda_label
                             TextInput:
-                                id: T_calda_t   
+                                id: calda_input
+                                input_filter: 'float'
         
                 BoxLayout:
                     height: 300
@@ -78,6 +81,7 @@
                     TextInput:
                         id: amp
                         font_size: (root.width**2 + root.height**3) / 14**2
+                        input_filter: 'float'
 
                     Label:
                         text: '0'
@@ -118,11 +122,12 @@
             id: intr_temp
             size_hint_y: 0.15
             text: "Introduceti o temperatura"
-        Button:
-            text: "Back"
-            size_hint_y: 0.1
-            on_release: 
-                root.daa()
+        BoxLayout:
+            id: kbContainer
+            size_hint_y: 0.2
+            orientation: "horizontal"
+            padding: 10
+
         BoxLayout:
             id: kbContainer
             size_hint_y: 0.2
@@ -132,7 +137,7 @@
             id: displayLabel
             size_hint_y: 0.15
             markup: True
-            text: "[b]Key pressed[/b] - None"
+            text: ""
             halign: "center"
         Widget:
             # Just a space taker to allow for the popup keyboard

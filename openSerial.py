@@ -3,7 +3,6 @@ import serial
 class SerialConnection:
     def __init__(self):
         self.serial_object = None
-        self.__connect__()
     
     def __connect__(self):
         try:
@@ -45,8 +44,11 @@ class SerialConnection:
             return filter_data_decode
     
     def send(self, data):
-        self.send_data = data
-        print('DATA_SEND-> ' + self.send_data)
-        self.serial_object.write(self.send_data.encode())
-    
+        send_data = data
+        
+        try:
+            self.serial_object.write(self.send_data.encode())
+            print('DATA_SEND-> ' + send_data)
+        except:
+            print("Send data not working!")
             
