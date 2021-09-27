@@ -9,9 +9,10 @@
         BoxLayout:
             orientation: 'horizontal'
             Label:
-                id: time
-                text: '[b]00[/b]:00:00'
-                pos_hint: {'top': 1}
+                id: clock
+                text: root.clock_time
+                font_size: self.width/10
+                pos_hint: {"left": 1}
             
             GridLayout:
                 cols: 1
@@ -36,25 +37,39 @@
                     
                     BoxLayout:
                         orientation: 'vertical'
+                        canvas:
+                            Color:
+                                rgb: 0, 0, 200/255
+                            Rectangle:
+                                size: self.size
+                                pos: self.pos
+                        
+                        padding: 20
+                        
                         Label:
                             text: 'Bazin apa rece'
                         
                         GridLayout:
-                            cols: 2
-                            Label:
-                                text: '0'
-                                id: rece_label
+                            cols: 1
                             TextInput:
                                 id: rece_input
                                 input_filter: 'float'
                     
                     BoxLayout:
                         orientation: 'vertical'
+                        canvas:
+                            Color:
+                                rgb: 200/255, 0, 0
+                            Rectangle:
+                                size: self.size
+                                pos: self.pos
+                        
                         Label:
                             text: 'Bazin apa calda'
                         
                         GridLayout:
                             cols: 2
+                            padding: 20
                             Label:
                                 text: '0'
                                 id: calda_label
@@ -65,7 +80,13 @@
                 BoxLayout:
                     height: 300
                     orientation: 'horizontal'
-                
+                    canvas:
+                        Color:
+                            rgb: 217/255, 176/255, 46/255
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+                    
                     GridLayout:
                         cols: 10
                         id: tempContainer
@@ -73,6 +94,7 @@
                 orientation: 'vertical'
                 
                 Button:
+                    id: heaters
                     text: "Start incalzire"
                 
                 BoxLayout:
@@ -80,7 +102,6 @@
                     
                     TextInput:
                         id: amp
-                        font_size: (root.width**2 + root.height**3) / 14**2
                         input_filter: 'float'
 
                     Label:
@@ -90,11 +111,14 @@
                     orientation: 'horizontal'
                     
                     Button:
+                        id: motor_plus
                         text: "+"
                     Button:
+                        id: motor_minus
                         text: "-"
                 Button:
-                    text: "Start/stop Motor"
+                    id: motor
+                    text: "Start"
 
 <Settings>:
     name: "settings"
