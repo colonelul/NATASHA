@@ -15,7 +15,7 @@ from kivy.config import Config
 from kivy.clock import Clock, mainthread
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-from openSerial import SerialConnection
+from openSerial import SerialConnection, Connection
 from SaveFile import ImportFile
 from keyboard import KeyboardScreen
 
@@ -35,10 +35,11 @@ class MainWindow(Screen):
     
     def __init__(self, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
+        self.value_laserToSend = bytearray(b'\x01\x03\x00a\x00\x01\xd5\xd4')
         self.arr_temp = None
         self.arr_rpm = None
         self._create_widgets()
-        #self.start_first_thread()
+        self.start_first_thread()
     
     
     
@@ -49,7 +50,6 @@ class MainWindow(Screen):
     
     def first_thread(self):
         SerialConnection().__connect__()
-        Clock.schedule_interval(self.update_time(), 1)
                
     @mainthread
     def update_label(self, txt):
@@ -134,9 +134,6 @@ class MainWindow(Screen):
         
         if values == None:
             import_file = ImportFile().add(None)
-            
-            print(import_file)
-            
 
         for key in self.name_temp:
             if key == "Duza": 
@@ -145,8 +142,11 @@ class MainWindow(Screen):
                 self.ids[key + "_lab"].text = str(import_file[key])
     
     def update_time(self):
-        self.clock_time = time.strftime("%H:%M:%S")
-        print(self.clock_time)
+        #self.clock_time = time.strftime("%H:%M:%S")
+        Connection.send(self.value_laserToSend)
+        data = Connection.get_data()
+        
+        print(data)
         
     def buttons_listen(self, instance, value):
         if value == "down":

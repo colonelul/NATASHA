@@ -6,68 +6,64 @@
     bite 5 -> 0
     bite 6 -> 1
     bite 7 -> 213
-    bite 8 -> 212 """
+    bite 8 -> 212 
+    
+   ~~PENTRU CH340 -> VID_1A86 PID_7523"""
 
-
+from serial.tools import list_ports
 import serial
 
 class SerialConnection:
     def __init__(self):
-        self.serial_object = None
+        self.devices_ids = {'CH340': {'VID': '1A86', 'PID': '7523'},
+                            'CAMERA': {'VID': '?', 'PID': '?'}}
+        self.__connect__()
+    
+    def device_port(self, devicess):
+        device_list = list_ports.comports()
+
+        for device in device_list:
+            if (device.vid != None or device.pid != None):
+                if ('{:04X}'.format(device.vid) == self.devices_ids[devicess]['VID'] and '{:04X}'.format(device.pid) == self.devices_ids[devicess]['PID']):
+                    port = device.device
+                    return port
+                port = None
     
     def __connect__(self):
+        portt = self.device_port('CH340')
         try:
-            '''~~Comunicare Serial pentru PC~~
-                 serial_object.port = 'COM?' -> ?: numarul portului de comunicare'''
+            print("Trying to connect -> " + portt)
             
-            print("Trying to connect(PC)")
-            
-            with serial.Serial() as self.serial_object:
-                self.serial_object.boudrate = 9600
-                self.serial_object.port = 'COM26' #selectare port 
-                self.serial_object.open()
-            
+            SERIAL_OBJECT = serial.Serial(
+                port = portt,                   #select port!
+                baudrate = 9600,                #select boudrate!
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS,
+                timeout = 0.5
+            )
         except:
-            '''comunicare Serial pentru RASPBERRY'''
-            
-            locations=['/dev/ttyUSB0', '/dev/ttyUSB1']
-            
-            for device in locations:
-                try:
-                    print("Trying..." + device)
-                    self.serial_object = serial.Serial(device, 9600)
-                    
-                    break
-                except:
-                    print("Failed to connet on" + device)
-        
+            print("Failed to connect on " + portt)
+
+class Connection(SerialConnection):
     def get_data(self):
-        filter_data_decode = ""
-        while(1):
-            try:
-                filter_data = self.serial_object.readline()
-                filter_data_decode = filter_data.decode('utf-8')
-            except:
-                print("Data received is NUll!")
-                
-            if filter_data_decode != "":
-                print("DATA_RECEIVED-> " + filter_data_decode)
-            return filter_data_decode
+        filter_data = None
+        try:
+            filter_data = self.SERIAL_OBJECT.readline().hex()
+        except:
+            print("Data received is NUll!")
+            
+        if filter_data != None:
+            print("DATA_RECEIVED-> " + filter_data)
+            
+        return filter_data
     
     def send(self, data):
-        send_data = data
-        
         try:
-            self.serial_object.write(self.send_data.encode())
-            print('DATA_SEND-> ' + send_data)
+            self.SERIAL_OBJECT.write(data)
+            print('DATA_SEND-> ' + str(data))
         except:
             print("Send data not working!")
-    
-    def send_to_laser(self):
-        values = bytearray([1, 3, 0, 97, 0, 1, 213, 212])
-        self.serial_object.write(values)
-
-SerialConnection().__connect__()
 
 
 

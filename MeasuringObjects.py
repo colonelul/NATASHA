@@ -7,20 +7,25 @@ import cv2
 
 class MeasuringObject():
     def __init__(self, image):
-        self.pixelsPermm = 10
+        self.pixelsPermm = 0.035
         self.img = image
+        self.process_image(self.img)
     
     def midpoint(self, ptA, ptB):
         return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
     
     def process_image(self, img):
-        image = cv2.imread(img)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        self.image = cv2.imread(img)
+        gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (7, 7), 0)
     
-        edged = cv2.Canny(gray, 50, 100)
+        edged = cv2.Canny(gray, 50, 150)
+        cv2.imshow("1-canny", edged)
         edged = cv2.dilate(edged, None, iterations=1)
+        cv2.imshow("2-dilate", edged)
         edged = cv2.erode(edged, None, iterations=1)
+        cv2.imshow("3-erode", edged)
+        cv2.waitKey(0)
     
     # find contours in the edge map
         self.cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
@@ -29,6 +34,8 @@ class MeasuringObject():
     
         # sort the contours from left-to-right
         (self.cnts, _) = contours.sort_contours(self.cnts)
+        
+        #self.contours()
     
     def contours(self):
     
@@ -37,7 +44,7 @@ class MeasuringObject():
             if cv2.contourArea(c) < 100:
                 continue
 
-            orig = self.img.copy()
+            orig = self.image.copy()
             box = cv2.minAreaRect(c)
             box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
             box = np.array(box, dtype="int")
@@ -81,4 +88,4 @@ class MeasuringObject():
             cv2.imshow("Image", orig)
             cv2.waitKey(0)
             
-            
+MeasuringObject('Z:/NATASHA/Camera/1.jpg')
