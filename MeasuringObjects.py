@@ -18,8 +18,6 @@ class MeasuringObject():
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (7, 7), 0)
     
-    # perform edge detection, then perform a dilation + erosion to
-    # close gaps in between object edges
         edged = cv2.Canny(gray, 50, 100)
         edged = cv2.dilate(edged, None, iterations=1)
         edged = cv2.erode(edged, None, iterations=1)
@@ -35,21 +33,18 @@ class MeasuringObject():
     def contours(self):
     
         for c in self.cnts:
-    	# if the contour is not sufficiently large, ignore it
+
             if cv2.contourArea(c) < 100:
                 continue
-        	# compute the rotated bounding box of the contour
+
             orig = self.img.copy()
             box = cv2.minAreaRect(c)
             box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
             box = np.array(box, dtype="int")
-        	# order the points in the contour such that they appear
-        	# in top-left, top-right, bottom-right, and bottom-left
-        	# order, then draw the outline of the rotated bounding
-        	# box
+
             box = perspective.order_points(box)
             cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
-        	# loop over the original points and draw them
+
             for (x, y) in box:
                 cv2.circle(orig, (int(x), int(y)), 5, (0, 0, 255), -1)
             

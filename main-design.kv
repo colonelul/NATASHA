@@ -5,9 +5,17 @@
     
     BoxLayout:
         orientation: 'vertical'
-        
-        BoxLayout:
-            orientation: 'horizontal'
+        size_hint_y: .8
+        canvas:
+            Color:
+                rgb: 0x26/255.0, 0x32/255.0, 0x38/255.0
+            Rectangle:
+                size: self.size
+    
+        GridLayout:
+            cols: 2
+            padding: 3
+            
             Label:
                 id: clock
                 text: root.clock_time
@@ -29,17 +37,20 @@
         
         GridLayout:
             cols: 2
+            padding: 3
         
             GridLayout:
                 cols: 1
                 BoxLayout:
+                    size_hint: 0.3, 0.26
                     orientation: 'horizontal'
                     
                     BoxLayout:
+                        id: bazin_rece
                         orientation: 'vertical'
                         canvas:
                             Color:
-                                rgb: 0, 0, 200/255
+                                rgb: 0, 0, 130/255
                             Rectangle:
                                 size: self.size
                                 pos: self.pos
@@ -47,34 +58,49 @@
                         padding: 20
                         
                         Label:
-                            text: 'Bazin apa rece'
+                            text: '[b]Bazin apa rece[/b]'
+                            font_size: '20sp'
+                            size_hint: (1, 0.1)
+                            markup: True
                         
                         GridLayout:
                             cols: 1
-                            TextInput:
-                                id: rece_input
-                                input_filter: 'float'
+                            padding: 20
+                            
+                            Label:
+                                text: '0'
+                                id: bazin_rece-lab
                     
                     BoxLayout:
+                        id: bazin_cald
                         orientation: 'vertical'
                         canvas:
                             Color:
-                                rgb: 200/255, 0, 0
+                                rgb: 130/255, 0, 0
                             Rectangle:
                                 size: self.size
                                 pos: self.pos
                         
+                        padding: 20
+                        
                         Label:
-                            text: 'Bazin apa calda'
+                            text: '[b]Bazin apa calda[/b]'
+                            font_size: '20sp'
+                            size_hint: (1, 0.1)
+                            markup: True
                         
                         GridLayout:
                             cols: 2
                             padding: 20
+                            
                             Label:
                                 text: '0'
-                                id: calda_label
+                                id: bazinCald_lab
+                                
                             TextInput:
-                                id: calda_input
+                                id: bazinCald_text
+                                size_hint: .8, None 
+                                height: 30
                                 input_filter: 'float'
         
                 BoxLayout:
@@ -95,30 +121,35 @@
                 
                 Button:
                     id: heaters
-                    text: "Start incalzire"
+                    text: "START Incalzire"
+                    background_color: 0, 210/255, 0
                 
                 BoxLayout:
                     orientation: 'horizontal'
                     
+                    padding: 20
+                    
                     TextInput:
-                        id: amp
+                        id: hz_text
                         input_filter: 'float'
 
                     Label:
-                        text: '0'
+                        id: hz_label
+                        text: '0Hz'
                 
                 BoxLayout:
                     orientation: 'horizontal'
                     
                     Button:
                         id: motor_plus
-                        text: "+"
+                        text: "+1Hz"
                     Button:
                         id: motor_minus
-                        text: "-"
+                        text: "-1Hz"
                 Button:
                     id: motor
-                    text: "Start"
+                    text: "START Motor"
+                    background_color: 0, 210/255, 0
 
 <Settings>:
     name: "settings"
@@ -142,10 +173,17 @@
     
     BoxLayout:
         orientation: 'vertical'
+        canvas:
+            Color:
+                rgb: 0x26/255.0, 0x32/255.0, 0x38/255.0
+            Rectangle:
+                size: self.size
+        
         Label:
             id: intr_temp
             size_hint_y: 0.15
-            text: "Introduceti o temperatura"
+            text: ""
+            font_size: "24sp"
         BoxLayout:
             id: kbContainer
             size_hint_y: 0.2
@@ -163,6 +201,7 @@
             markup: True
             text: ""
             halign: "center"
+            font_size: '23sp'
         Widget:
             # Just a space taker to allow for the popup keyboard
             size_hint_y: 0.5

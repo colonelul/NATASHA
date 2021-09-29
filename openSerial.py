@@ -1,3 +1,14 @@
+""" Comunicare cu laserul (LST-25/JIB) pentru a obtine date de la dansul 
+    bite 1 -> 1
+    bite 2 -> 3
+    bite 3 -> 0
+    bite 4 -> 97 
+    bite 5 -> 0
+    bite 6 -> 1
+    bite 7 -> 213
+    bite 8 -> 212 """
+
+
 import serial
 
 class SerialConnection:
@@ -51,4 +62,21 @@ class SerialConnection:
             print('DATA_SEND-> ' + send_data)
         except:
             print("Send data not working!")
-            
+    
+    def send_to_laser(self):
+        values = bytearray([1, 3, 0, 97, 0, 1, 213, 212])
+        self.serial_object.write(values)
+
+SerialConnection().__connect__()
+
+
+
+
+
+
+
+
+
+
+
+

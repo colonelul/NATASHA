@@ -4,6 +4,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 from functools import partial
 from openSerial import SerialConnection  
+from SaveFile import ImportFile
 
 class KeyboardScreen(Screen):
     
@@ -21,7 +22,7 @@ class KeyboardScreen(Screen):
         #partial(self.set_layout, layouts)
         
         self.kbContainer.add_widget(Button(
-                    text="dai",
+                    text="dai", size_hint= (.2, .2),
                     on_release=partial(self.set_layout, layouts)))
     
     def set_layout(self, layout, button):
@@ -54,17 +55,25 @@ class KeyboardScreen(Screen):
     def display_temp(self, keyy):
         if self.manager.screens[0].ids.share_data == 'heaters':
             self.temperature += u"{0}".format(keyy)
-            if int(self.temperature) < 321:
-                self.displayLabel.text = self.temperature
+            if int(self.temperature) < 321 and self.temperature != "0" and self.temperature != "." and self.temperature != "":
+                self.displayLabel.text = "Temperatura introdusa este: " + self.temperature + "*C"
             else:
                 self.clear_temp_label()
+                
         elif self.manager.screens[0].ids.share_data == 'bazin_cald':
             self.temperature += u"{0}".format(keyy)
-            if int(self.temperature) < 90:
-                self.displayLabel.text = self.temperature
+            if int(self.temperature) < 90 and self.temperature != "0" and self.temperature != "." and self.temperature != "":
+                self.displayLabel.text = "Temperatura introdusa este: " + self.temperature + "*C"
             else:
                 self.clear_temp_label()
-    
+                
+        elif self.manager.screens[0].ids.share_data == 'Hz':
+            self.temperature += u"{0}".format(keyy)
+            if int(self.temperature) < 60 and self.temperature != "0" and self.temperature != "." and self.temperature != "":
+                self.displayLabel.text = "Temperatura introdusa este: " + self.temperature + "*C"
+            else:
+                self.clear_temp_label()
+            
     def clear_temp_label(self):
         self.displayLabel.text = ""
         self.temperature = ""

@@ -37,7 +37,7 @@ class MainWindow(Screen):
         super(MainWindow, self).__init__(**kwargs)
         self.arr_temp = None
         self.arr_rpm = None
-        self._temperatures_widget()
+        self._create_widgets()
         #self.start_first_thread()
     
     
@@ -53,45 +53,62 @@ class MainWindow(Screen):
                
     @mainthread
     def update_label(self, txt):
-        self.change_text_label(txt)
+        self.change_text_onStart(txt)
     
     def on_focus(self, instance, value):
         self.manager.current = 'keyboard'
         if instance in self.ids.values():
             txt_focuses = self.key_to_id(instance)
-            if txt_focuses[0 : txt_focuses.find("-")] in self.name_temp:
-                if txt_focuses[0 : txt_focuses.find("-")] + "-text" == txt_focuses:
-                    self.manager.screens[3].ids.intr_temp.text = "Introduceti o temperatura cumprinsa intre valorile 0 - 320*C"
-                    self.manager.screens[0].ids.share_data = "heaters"
-                    self.ids[txt_focuses[0 : txt_focuses.find("-")] + "-lab"].text = self.ids[txt_focuses].text
+            if txt_focuses[0 : txt_focuses.find("_")] + "_text" == txt_focuses:
+                self.manager.screens[3].ids.intr_temp.text = "Introduceti o temperatura cuprinsa intre valorile 0 - 320*C"
+                self.manager.screens[0].ids.share_data = "heaters"
+            elif txt_focuses == "bazinCald_text":
+                self.manager.screens[3].ids.intr_temp.text = "Introduceti o temperatura cuprinsa intre valorile 0 - 90*C"
+                self.manager.screens[0].ids.share_data = "bazin_cald"
+            elif txt_focuses == "hz_text":
+                self.manager.screens[3].ids.intr_temp.text = "Introduceti o hrecventa cuprinsa intre valorile 0 - 60Hz"
+                self.manager.screens[0].ids.share_data = "Hz"
+            
+            try:
+                self.ids[txt_focuses[0 : txt_focuses.find("_")] + "_lab"].text = self.ids[txt_focuses].text
+            except:
+                pass
             
             if len(self.ids[txt_focuses].text) > 0 and value:
                 self.ids[txt_focuses].text = ""
+                            
+            ImportFile().export_file(txt_focuses[0 : txt_focuses.find("_")], self.ids[txt_focuses[0 : txt_focuses.find("_")] + "_lab"].text)
                 
-    def _temperatures_widget(self):
+    def _create_widgets(self):
         
         for key in self.name_temp:
-            lab = Label(text=key)
-            self.tempContainer.add_widget(lab, 0)
+            lab = Label(text="[b][color=#000000]" + key + "[/color][/b]", markup=True, font_size="20sp")
+            self.tempContainer.add_widget(lab)
             
         for keyy in self.name_temp:
             lab = Label(text='0')
-            self.ids[keyy + "-lab"] = lab
-            self.tempContainer.add_widget(lab, 1)
-            
+            self.ids[keyy + "_lab"] = lab
+            self.tempContainer.add_widget(lab)
+             
         for keyyy in self.name_temp:
-            text = TextInput(input_filter='float')
-            self.ids[keyyy + "-text"] = text
+            text = TextInput(input_filter='float', size_hint= (.8, None), height= 30)
+            self.ids[keyyy + "_text"] = text
             self.tempContainer.add_widget(text)
             text.bind(focus=self.on_focus)
         
-        self.ids.amp.bind(focus=self.on_focus)
-        self.ids.calda_input.bind(focus=self.on_focus)
+        for keyyy in range(10):
+            lab = Label(text="[b][color=#000000]FAN:[/color]\n0%[/b]", markup=True, font_size="16sp")
+            self.ids["rpm" + str(keyyy)] = lab
+            self.tempContainer.add_widget(lab)
+        
+        self.ids.hz_text.bind(focus=self.on_focus)
+        self.ids.bazinCald_text.bind(focus=self.on_focus)
         self.ids.heaters.bind(state=self.buttons_listen)
         self.ids.motor.bind(state=self.buttons_listen)
         self.ids.motor_plus.bind(state=self.buttons_listen)
         self.ids.motor_minus.bind(state=self.buttons_listen)
-        self.change_text_label(None)
+        
+        self.change_text_onStart(None)
         
     def separate_data_serial(self):
         data_received = SerialConnection().get_data()
@@ -113,17 +130,19 @@ class MainWindow(Screen):
             
         return self.arr_temp
             
-    def change_text_label(self, values):
+    def change_text_onStart(self, values):
         
         if values == None:
-            data_file_object = ImportFile()
-            import_file = ImportFile.load(data_file_object)
+            import_file = ImportFile().add(None)
             
+            print(import_file)
+            
+
         for key in self.name_temp:
             if key == "Duza": 
-                self.ids[key + "-lab"].text = str(import_file['duza'])
+                self.ids[key + "_lab"].text = str(import_file['duza'])
             else:
-                self.ids[key + "-lab"].text = str(import_file[key])
+                self.ids[key + "_lab"].text = str(import_file[key])
     
     def update_time(self):
         self.clock_time = time.strftime("%H:%M:%S")
@@ -135,9 +154,17 @@ class MainWindow(Screen):
             if idd in self.buttons:
                 self.send_to_serial(idd+"-start" if self.buttons[idd] else idd+"-stop")
                 if self.buttons[idd]:
-                    self.ids[idd].background_color = (0, 210/255, 0,)
+                    self.ids[idd].background_color = (0, 210/255, 0)
+                    if idd == "heaters":   
+                        self.ids[idd].text = "START Incalzire"
+                    elif idd == "motor":
+                        self.ids[idd].text = "START Motor"
                 else:
-                    self.ids[idd].background_color = (250/255, 0, 0,)
+                    self.ids[idd].background_color = (250/255, 0, 0)
+                    if idd == "heaters":   
+                        self.ids[idd].text = "STOP Incalzire"
+                    elif idd == "motor":
+                        self.ids[idd].text = "STOP Motor"
                 
                 self.buttons[idd] = not self.buttons[idd]
                         
@@ -163,6 +190,13 @@ class Plots(Screen):
 
 class SScreenManager(ScreenManager):
     pass
+
+class PopUp:
+    def err_worning():
+        pass
+    
+    def err_dead():
+        pass
 
 class MainUiApp(App):
     sm = None
