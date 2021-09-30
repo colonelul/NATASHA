@@ -19,10 +19,10 @@ class MeasuringObject():
         gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (7, 7), 0)
     
-        edged = cv2.Canny(gray, 50, 150)
-        cv2.imshow("1-canny", edged)
+        edged = cv2.Canny(gray, 100, 200)
+        #cv2.imshow("1-canny", edged)
         edged = cv2.dilate(edged, None, iterations=1)
-        cv2.imshow("2-dilate", edged)
+        #cv2.imshow("2-dilate", edged)
         edged = cv2.erode(edged, None, iterations=1)
         cv2.imshow("3-erode", edged)
         cv2.waitKey(0)
@@ -31,11 +31,14 @@ class MeasuringObject():
         self.cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
     	cv2.CHAIN_APPROX_SIMPLE)
         self.cnts = imutils.grab_contours(self.cnts)
-    
+        f = open("data.txt", "a")
+        f.write(self.cnts)
+        f.close()
+        
         # sort the contours from left-to-right
         (self.cnts, _) = contours.sort_contours(self.cnts)
         
-        #self.contours()
+        self.contours()
     
     def contours(self):
     

@@ -6,18 +6,22 @@ Created on Wed Sep 15 11:18:48 2021
 """
 import threading
 import time
+import openSerial
+import cv2
 
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import ObjectProperty, StringProperty
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.config import Config
-from kivy.clock import Clock, mainthread
+from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-from openSerial import SerialConnection, Connection
+from kivy.uix.image import Image
+from kivy.graphics.texture import Texture
 from SaveFile import ImportFile
 from keyboard import KeyboardScreen
+
 
 Config.set('graphics', 'width', '1280')
 Config.set('graphics', 'height', '1024')
@@ -32,28 +36,57 @@ class MainWindow(Screen):
     buttons = {'motor': False, 'heaters': False, 'pompa': False}
     tempContainer = ObjectProperty()
     clock_time = StringProperty("")
+    temperatures = NumericProperty
+    fps = NumericProperty(30)    
     
     def __init__(self, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
         self.value_laserToSend = bytearray(b'\x01\x03\x00a\x00\x01\xd5\xd4')
         self.arr_temp = None
         self.arr_rpm = None
-        self._create_widgets()
+        self.capture = cv2.VideoCapture(0)
+        openSerial.connect()
+        self._create_widgets()   
         self.start_first_thread()
     
-    
-    
     def start_first_thread(self):
-        t1 = threading.Thread(target=self.first_thread)
-        t1.daemon = True
+        t1 = threading.Thread(target=self.first_thread, daemon = True)
         t1.start()
+        self.start_second_thread()
+    
+    def start_second_thread(self):
+        t2 = threading.Thread(target=self.second_thread, daemon = True)
+        t2.start()
     
     def first_thread(self):
-        SerialConnection().__connect__()
-               
-    @mainthread
-    def update_label(self, txt):
-        self.change_text_onStart(txt)
+        Clock.schedule_interval(lambda dt: self.update(), 0.5)
+        Clock.schedule_interval(lambda dt: self.update_laser(), 0.05)
+    
+    def second_thread(self):
+        Clock.schedule_interval(lambda dt: self.update_camera(), 1.0 / self.fps)
+    
+    def update_laser(self):
+        self.data_received = openSerial.send(self.value_laserToSend)
+        data = openSerial.get_data()
+        if data != None:
+            try:
+                data_str = str(float.fromhex(data[6:10])*0.001)
+                self.ids.dFilament_laser.text = "[b]Dimensiune filament(Laser): [/b]" + data_str
+            except:
+                pass
+    
+    def update_camera(self):
+        try:
+            ret, frame = self.capture.read()
+            buf = cv2.flip(frame, 0).tostring()
+            texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt="bgr")
+            texture.blit_buffer(buf, colorfmt="bgr", bufferfmt="ubyte")
+            self.ids.camera.texture = texture
+        except:
+            pass
+            
+    def update(self):
+        self.ids.clock.text = time.strftime("%H:%M:%S")
     
     def on_focus(self, instance, value):
         self.manager.current = 'keyboard'
@@ -86,7 +119,7 @@ class MainWindow(Screen):
             self.tempContainer.add_widget(lab)
             
         for keyy in self.name_temp:
-            lab = Label(text='0')
+            lab = Label(text=str(self.temperatures))
             self.ids[keyy + "_lab"] = lab
             self.tempContainer.add_widget(lab)
              
@@ -111,7 +144,7 @@ class MainWindow(Screen):
         self.change_text_onStart(None)
         
     def separate_data_serial(self):
-        data_received = SerialConnection().get_data()
+        data_received = openSerial.get_data()
         
         if len(data_received) > 0:
             try:
@@ -140,19 +173,12 @@ class MainWindow(Screen):
                 self.ids[key + "_lab"].text = str(import_file['duza'])
             else:
                 self.ids[key + "_lab"].text = str(import_file[key])
-    
-    def update_time(self):
-        #self.clock_time = time.strftime("%H:%M:%S")
-        Connection.send(self.value_laserToSend)
-        data = Connection.get_data()
-        
-        print(data)
         
     def buttons_listen(self, instance, value):
         if value == "down":
             idd = self.key_to_id(instance)
             if idd in self.buttons:
-                self.send_to_serial(idd+"-start" if self.buttons[idd] else idd+"-stop")
+                openSerial.send(idd+"-start" if self.buttons[idd] else idd+"-stop")
                 if self.buttons[idd]:
                     self.ids[idd].background_color = (0, 210/255, 0)
                     if idd == "heaters":   
@@ -177,10 +203,6 @@ class MainWindow(Screen):
     def key_to_id(self, inst):
         return list(self.ids.keys())[list(self.ids.values()).index(inst)]
     
-    def send_to_serial(self, send):
-        sendd = SerialConnection()
-        papa = SerialConnection.send(sendd, send)
-    
 class Settings(Screen):
     def dada(self):
         self.manager.current = 'mode'
@@ -202,8 +224,6 @@ class MainUiApp(App):
     sm = None
     
     def build(self):
-        bau = MainWindow()
-        Clock.schedule_interval(lambda dt: bau.update_time(), 1)
         
         self.sm = ScreenManager()
         self.sm.add_widget(MainWindow(name='mode'))

@@ -3,7 +3,6 @@ from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 from functools import partial
-from openSerial import SerialConnection  
 from SaveFile import ImportFile
 
 class KeyboardScreen(Screen):
@@ -43,7 +42,7 @@ class KeyboardScreen(Screen):
     
     def key_press(self, keyboard, keycode, *args):
         if keycode == "enter":
-            SerialConnection().send(self.temperature)
+            #SerialConnection().send(self.temperature)
             self.clear_temp_label()
             self.kb.release()
             self.manager.current = "mode"

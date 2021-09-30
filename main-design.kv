@@ -1,40 +1,64 @@
-<MainWindow>:
+<MainWindow, CreateWidget>:
     id: share_data
     name: "main"
     tempContainer: tempContainer
     
     BoxLayout:
         orientation: 'vertical'
-        size_hint_y: .8
+        size_hint_y: 
         canvas:
             Color:
                 rgb: 0x26/255.0, 0x32/255.0, 0x38/255.0
             Rectangle:
                 size: self.size
-    
         GridLayout:
             cols: 2
             padding: 3
             
             Label:
                 id: clock
-                text: root.clock_time
+                text: ""
                 font_size: self.width/10
-                pos_hint: {"left": 1}
             
-            GridLayout:
-                cols: 1
-                col_force_default: True
-                col_default_width: 30
-                row_force_default: True
-                row_default_height: 30
-                Button:
-                    text: "p"
-                    on_release: root.manager.current = 'plots'
-                Button:
-                    text: "s"
-                    on_release: root.manager.current = 'settings'
-        
+            BoxLayout:
+                id: block
+                orientation: 'vertical'
+            
+                GridLayout:
+                    cols: 1
+                    col_force_default: True
+                    col_default_width: 30
+                    row_force_default: True
+                    row_default_height: 30
+                    Button:
+                        text: "p"
+                        on_release: root.manager.current = 'plots'
+                    Button:
+                        text: "s"
+                        on_release: root.manager.current = 'settings'
+                Image:
+                    id: camera
+                    size: block.size
+                    
+                GridLayout:
+                    cols:2
+                    row_force_default: True
+                    row_default_height: 300
+                    
+                    Label:
+                        id: dFilament_laser
+                        text: "[b]Dimensiune filament(Laser):[/b]"
+                        font_size: '20sp'
+                        size_hint: (1, 0.1)
+                        markup: True
+                        
+                    Label:
+                        id: dFilament_camera
+                        text: "[b]Dimensiune filament(Camera):[/b]"
+                        font_size: '20sp'
+                        size_hint: (1, 0.1)
+                        markup: True
+            
         GridLayout:
             cols: 2
             padding: 3
@@ -132,10 +156,15 @@
                     TextInput:
                         id: hz_text
                         input_filter: 'float'
+                        size_hint: .8, None 
+                        height: 30
 
                     Label:
                         id: hz_label
                         text: '0Hz'
+                        font_size: '20sp'
+                        size_hint: (1, 0.1)
+                        markup: True
                 
                 BoxLayout:
                     orientation: 'horizontal'
