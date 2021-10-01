@@ -83,7 +83,7 @@ class MainWindow(Screen):
             MotorFilament.__onStrat("after-start")
         
         if self.data_receive != None and self.data_receive[:2] == self.devices_adress['hault']:
-            
+            self.Strat = False
             
         openSerial.send(self.value_laserToSend)
         self.data_receive = self.get_dat()
