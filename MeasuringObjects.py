@@ -24,16 +24,10 @@ class MeasuringObject():
         edged = cv2.dilate(edged, None, iterations=1)
         #cv2.imshow("2-dilate", edged)
         edged = cv2.erode(edged, None, iterations=1)
-        cv2.imshow("3-erode", edged)
-        cv2.waitKey(0)
-    
     # find contours in the edge map
         self.cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
     	cv2.CHAIN_APPROX_SIMPLE)
         self.cnts = imutils.grab_contours(self.cnts)
-        f = open("data.txt", "a")
-        f.write(self.cnts)
-        f.close()
         
         # sort the contours from left-to-right
         (self.cnts, _) = contours.sort_contours(self.cnts)
@@ -44,8 +38,10 @@ class MeasuringObject():
     
         for c in self.cnts:
 
-            if cv2.contourArea(c) < 100:
-                continue
+# =============================================================================
+#             if cv2.contourArea(c) < 100:
+#                 continue
+# =============================================================================
 
             orig = self.image.copy()
             box = cv2.minAreaRect(c)

@@ -12,16 +12,14 @@
 
 from serial.tools import list_ports
 import serial
-import io
 import time
-import cv2
 
 global serial_object
 
 devices_ids = {'CH340': {'VID': '1A86', 'PID': '7523'}}
 
 """Activate debug mode!"""
-debug = False
+debug = True
 
 def device_port(devicess):
     device_list = list_ports.comports()

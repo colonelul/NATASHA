@@ -32,18 +32,22 @@ Config.write()
 kv_file = Builder.load_file("main-design.kv")
 
 class MainWindow(Screen):
+    
     name_temp = ["Duza", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9"]
     buttons = {'motor': False, 'heaters': False, 'pompa': False}
+    devices_adress = {'laser': '01', 'hault': '02', 'motor_natasha': '03'}
     tempContainer = ObjectProperty()
     clock_time = StringProperty("")
     temperatures = NumericProperty
-    fps = NumericProperty(30)    
+    fps = NumericProperty(30)
+    Start = True
     
     def __init__(self, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
         self.value_laserToSend = bytearray(b'\x01\x03\x00a\x00\x01\xd5\xd4')
         self.arr_temp = None
         self.arr_rpm = None
+        self.data_receive = None
         self.capture = cv2.VideoCapture(0)
         openSerial.connect()
         self._create_widgets()   
@@ -58,23 +62,36 @@ class MainWindow(Screen):
         t2 = threading.Thread(target=self.second_thread, daemon = True)
         t2.start()
     
+    def start_three_thread(self):
+        t3 = threading.Thread(target=self.three_thread, daemon = True).start()
+    
     def first_thread(self):
-        Clock.schedule_interval(lambda dt: self.update(), 0.5)
-        Clock.schedule_interval(lambda dt: self.update_laser(), 0.05)
+        Clock.schedule_interval(lambda dt: self.update_GUI(), 1 / 10)
+        Clock.schedule_interval(lambda dt: self.send_dat(), 0.05)
     
     def second_thread(self):
         Clock.schedule_interval(lambda dt: self.update_camera(), 1.0 / self.fps)
     
-    def update_laser(self):
-        self.data_received = openSerial.send(self.value_laserToSend)
-        data = openSerial.get_data()
-        if data != None:
-            try:
-                data_str = str(float.fromhex(data[6:10])*0.001)
-                self.ids.dFilament_laser.text = "[b]Dimensiune filament(Laser): [/b]" + data_str
-            except:
-                pass
+    def three_thread(self):
+        Clock.schedule_interval(lambda dt: self.get_dat(), 5 / 100)
     
+    def send_dat(self):
+        if self.Start:
+            m = MotorFilament()
+            MotorFilament.__onStart("start")
+        else:
+            MotorFilament.__onStrat("after-start")
+        
+        if self.data_receive != None and self.data_receive[:2] == self.devices_adress['hault']:
+            
+            
+        openSerial.send(self.value_laserToSend)
+        self.data_receive = self.get_dat()
+    
+    def get_dat(self):
+        data = openSerial.get_data()
+        return data
+        
     def update_camera(self):
         try:
             ret, frame = self.capture.read()
@@ -84,9 +101,19 @@ class MainWindow(Screen):
             self.ids.camera.texture = texture
         except:
             pass
-            
-    def update(self):
+    
+    def update_GUI(self):
         self.ids.clock.text = time.strftime("%H:%M:%S")
+        if self.data_receive != None:
+            if self.data_receive[:2] == self.devices_adress['laser']:
+                try:
+                    data_str = str(float.fromhex(self.data_receive[6:10])*0.001)
+                    self.ids.dFilament_laser.text = "[b]Dimensiune filament(Laser): [/b]" + data_str
+                except:
+                    pass
+                
+            if self.data_receive[:3] == self.devices_adress['hault']:
+                print(self.data_receive)
     
     def on_focus(self, instance, value):
         self.manager.current = 'keyboard'
@@ -101,7 +128,6 @@ class MainWindow(Screen):
             elif txt_focuses == "hz_text":
                 self.manager.screens[3].ids.intr_temp.text = "Introduceti o hrecventa cuprinsa intre valorile 0 - 60Hz"
                 self.manager.screens[0].ids.share_data = "Hz"
-            
             try:
                 self.ids[txt_focuses[0 : txt_focuses.find("_")] + "_lab"].text = self.ids[txt_focuses].text
             except:
@@ -220,6 +246,38 @@ class PopUp:
     def err_dead():
         pass
 
+class MotorFilament:
+    def __init__(self):
+        self.send_array
+        
+    def CRC(self, cnt):
+        CRC_result = 0xFFFF
+        for c in range(len(cnt)+1):
+            CRC_result ^= self.send_array[c]
+            
+            for cc in range(8):
+                if CRC_result & 0x01:
+                    CRC_result = CRC_result >> 1
+                    CRC_result ^= 0xA001
+                else:
+                    CRC_result = CRC_result >> 1
+                    
+        self.send_array[cnt + 1] |= CRC_result
+        self.send_array[cnt + 2] |= CRC_result >> 8
+        
+        for ccc in range(len(cnt)+3):
+            openSerial.send(self.send_array[ccc])
+            
+    def __onStart(self, comm):
+        try:
+            if comm == 'start':
+                self.send_array = b'0x02\0x06\0x02\0x3C\0x0\0x05'
+            elif comm == 'after-start': 
+                self.send_array = b'0x02\0x06\0x03\0x0C\0x0\0x81'
+            self.CRC(5)
+        except:
+            pass
+        
 class MainUiApp(App):
     sm = None
     
