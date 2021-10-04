@@ -104,35 +104,41 @@ devices_adress = {'laser': '01', 'hault': '02', 'motor_natasha': '03'}
 
 devices_adress['laser']
 
+t1 = 
+t2 = 20104
+
+print(t2 >> 8)
 
 
+print(bytearray([0x2, 0x6, 0x04, 0x0E, 0x00, 0x00]))
 
+class RS485:
+    send = None
+    def __init__(self):
+        self.send_array = {'start': [0x02, 0x06, 0x02, 0x3C, 0x00, 0x05],
+                           'after-start': [0x02, 0x06, 0x03, 0x0C, 0x0, 0x81]}
+        
+    def CRC(self, cnt, status):
+        CRC_result = 0xFFFF
+        for c in range(cnt + 1):
+            CRC_result ^= self.send_array[status][c]
+            for cc in range(8):
+                if CRC_result & 0x01:
+                    CRC_result = CRC_result >> 1
+                    CRC_result ^= 0xA001
+                else:
+                    CRC_result = CRC_result >> 1
+                    
+        print(CRC_result)
+        
+        hhh,lll = CRC_result.to_bytes(2, 'big')
+        
+        self.send_array[status].append(lll)
+        self.send_array[status].append(hhh)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        print(bytearray(self.send_array[status]))
+            
+    def onStart(self, index):
+        self.CRC(5, index)
+        
+RS485().onStart('start')

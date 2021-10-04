@@ -35,12 +35,12 @@ class MainWindow(Screen):
     
     name_temp = ["Duza", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9"]
     buttons = {'motor': False, 'heaters': False, 'pompa': False}
-    devices_adress = {'laser': '01', 'hault': '02', 'motor_natasha': '03'}
+    devices_adress = {'laser': '01', 'hault': '02', 'motor_extrusie': '03'}
     tempContainer = ObjectProperty()
     clock_time = StringProperty("")
     temperatures = NumericProperty
     fps = NumericProperty(30)
-    Start = True
+    Start = 1
     
     def __init__(self, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
@@ -48,6 +48,7 @@ class MainWindow(Screen):
         self.arr_temp = None
         self.arr_rpm = None
         self.data_receive = None
+        self.motorFilament_status = 'STOP'
         self.capture = cv2.VideoCapture(0)
         openSerial.connect()
         self._create_widgets()   
@@ -76,17 +77,26 @@ class MainWindow(Screen):
         Clock.schedule_interval(lambda dt: self.get_dat(), 5 / 100)
     
     def send_dat(self):
-        if self.Start:
-            m = MotorFilament()
-            MotorFilament.__onStart("start")
-        else:
-            MotorFilament.__onStrat("after-start")
+        if self.Start == 1:
+            RS485().onStart("start")
+        elif self.Start == 2:
+
+            RS485().onStart("after-start")
+            self.Start == 3
+            self.motorFilament_status = 'START'
         
-        if self.data_receive != None and self.data_receive[:2] == self.devices_adress['hault']:
-            self.Strat = False
+        if self.data_receive != None and self.data_receive[:2] == self.devices_adress['hault'] and self.Start != 3:
+            print("aaaaaa")
+            self.Start = 2
             
+        
+        time.sleep(3.0 / 100)
+        
         openSerial.send(self.value_laserToSend)
+        
         self.data_receive = self.get_dat()
+        
+        time.sleep(3.0 / 100)
     
     def get_dat(self):
         data = openSerial.get_data()
@@ -112,8 +122,8 @@ class MainWindow(Screen):
                 except:
                     pass
                 
-            if self.data_receive[:3] == self.devices_adress['hault']:
-                print(self.data_receive)
+            if self.data_receive[:2] == self.devices_adress['hault']:
+                print("motor - > " + str(self.data_receive))
     
     def on_focus(self, instance, value):
         self.manager.current = 'keyboard'
@@ -229,6 +239,10 @@ class MainWindow(Screen):
     def key_to_id(self, inst):
         return list(self.ids.keys())[list(self.ids.values()).index(inst)]
     
+    def motor_run(self):
+        if self.motorFilament_status == 'Start':
+            RS485().motor_run()
+    
 class Settings(Screen):
     def dada(self):
         self.manager.current = 'mode'
@@ -246,38 +260,54 @@ class PopUp:
     def err_dead():
         pass
 
-class MotorFilament:
+class RS485:
     def __init__(self):
-        self.send_array
+        self.send_array = {'start': [0x02, 0x06, 0x02, 0x3C, 0x00, 0x05],
+                           'after-start': [0x02, 0x06, 0x03, 0x0C, 0x0, 0x81],
+                           'stop': [0x2, 0x6, 0x04, 0x0E, 0x00, 0x00],
+                           'run': [0x2, 0x6, 0x04, 0x0A, 0x0, 0x0],
+                           'after-run': [0x2, 0x6, 0x04, 0x0E, 0x0, 0x81]}
         
-    def CRC(self, cnt):
+    def CRC(self, cnt, status):
+        send = b''
         CRC_result = 0xFFFF
-        for c in range(len(cnt)+1):
-            CRC_result ^= self.send_array[c]
-            
+        for c in range(cnt + 1):
+            CRC_result ^= self.send_array[status][c]
             for cc in range(8):
                 if CRC_result & 0x01:
                     CRC_result = CRC_result >> 1
                     CRC_result ^= 0xA001
                 else:
                     CRC_result = CRC_result >> 1
-                    
-        self.send_array[cnt + 1] |= CRC_result
-        self.send_array[cnt + 2] |= CRC_result >> 8
         
-        for ccc in range(len(cnt)+3):
-            openSerial.send(self.send_array[ccc])
+        hhh,lll = CRC_result.to_bytes(2, 'big')
+        
+        self.send_array[status].append(lll)
+        self.send_array[status].append(hhh)
+        
+        openSerial.send(bytearray(self.send_array[status]))
             
-    def __onStart(self, comm):
-        try:
-            if comm == 'start':
-                self.send_array = b'0x02\0x06\0x02\0x3C\0x0\0x05'
-            elif comm == 'after-start': 
-                self.send_array = b'0x02\0x06\0x03\0x0C\0x0\0x81'
-            self.CRC(5)
-        except:
-            pass
+    def onStart(self, index):
+        self.CRC(5, index)
+    
+    def motorStop(self):
+        self.motorFilament_status = 'STOP'
+        openSerial.send(bytearray(self.send_array['stop']))
+    
+    def motor_run(self, h, l, status):
+        self.send_array['run'][4] = h
+        self.send_array['run'][5] = l
         
+        if status:
+            self.CRC(5, self.send_array['run'])
+            time.sleep(5.0 / 100)
+            self.CRC(5, self.send_array['after-run'])
+            time.sleep(5.0 / 100)
+        else:
+            self.CRC(5, self.send_array['run'])
+            time.sleep(5.0 / 100)
+            
+
 class MainUiApp(App):
     sm = None
     
