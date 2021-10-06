@@ -1,0 +1,260 @@
+<MainWindow, CreateWidget>:
+    id: share_data
+    name: "main"
+    tempContainer: tempContainer
+    
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_y: 
+        canvas:
+            Color:
+                rgb: 0x26/255.0, 0x32/255.0, 0x38/255.0
+            Rectangle:
+                size: self.size
+        GridLayout:
+            cols: 2
+            padding: 3
+            
+            Label:
+                id: clock
+                text: ""
+                font_size: self.width/10
+            
+            BoxLayout:
+                id: block
+                orientation: 'vertical'
+            
+                GridLayout:
+                    cols: 1
+                    col_force_default: True
+                    col_default_width: 30
+                    row_force_default: True
+                    row_default_height: 30
+                    Button:
+                        text: "p"
+                        on_release: root.manager.current = 'plots'
+                    Button:
+                        text: "s"
+                        on_release: root.manager.current = 'settings'
+                Image:
+                    id: camera
+                    size: block.size
+                    
+                GridLayout:
+                    cols:2
+                    row_force_default: True
+                    row_default_height: 300
+                    
+                    Label:
+                        id: dFilament_laser
+                        text: "[b]Dimensiune filament(Laser):[/b]"
+                        font_size: '20sp'
+                        size_hint: (1, 0.1)
+                        markup: True
+                        
+                    Label:
+                        id: dFilament_camera
+                        text: "[b]Dimensiune filament(Camera):[/b]"
+                        font_size: '20sp'
+                        size_hint: (1, 0.1)
+                        markup: True
+            
+        GridLayout:
+            cols: 2
+            padding: 3
+        
+            GridLayout:
+                cols: 1
+                BoxLayout:
+                    size_hint: 0.3, 0.26
+                    orientation: 'horizontal'
+                    
+                    BoxLayout:
+                        id: bazin_rece
+                        orientation: 'vertical'
+                        canvas:
+                            Color:
+                                rgb: 0, 0, 130/255
+                            Rectangle:
+                                size: self.size
+                                pos: self.pos
+                        
+                        padding: 20
+                        
+                        Label:
+                            text: '[b]Bazin apa rece[/b]'
+                            font_size: '20sp'
+                            size_hint: (1, 0.1)
+                            markup: True
+                        
+                        GridLayout:
+                            cols: 1
+                            padding: 20
+                            
+                            Label:
+                                text: '0'
+                                id: bazin_rece-lab
+                    
+                    BoxLayout:
+                        id: bazin_cald
+                        orientation: 'vertical'
+                        canvas:
+                            Color:
+                                rgb: 130/255, 0, 0
+                            Rectangle:
+                                size: self.size
+                                pos: self.pos
+                        
+                        padding: 20
+                        
+                        Label:
+                            text: '[b]Bazin apa calda[/b]'
+                            font_size: '20sp'
+                            size_hint: (1, 0.1)
+                            markup: True
+                        
+                        GridLayout:
+                            cols: 2
+                            padding: 20
+                            
+                            Label:
+                                text: '0'
+                                id: bazinCald_lab
+                                
+                            TextInput:
+                                id: bazinCald_text
+                                size_hint: .8, None 
+                                height: 30
+                                input_filter: 'float'
+        
+                BoxLayout:
+                    height: 300
+                    orientation: 'horizontal'
+                    canvas:
+                        Color:
+                            rgb: 217/255, 176/255, 46/255
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+                    
+                    GridLayout:
+                        cols: 10
+                        id: tempContainer
+            BoxLayout:
+                orientation: 'vertical'
+                
+                Button:
+                    id: heaters
+                    text: "START Incalzire"
+                    background_color: 0, 210/255, 0
+                
+                BoxLayout:
+                    orientation: 'horizontal'
+                    
+                    padding: 20
+                    
+                    TextInput:
+                        id: hz_text
+                        input_filter: 'float'
+                        size_hint: .8, None 
+                        height: 30
+
+                    Label:
+                        id: hz_label
+                        text: '0Hz'
+                        font_size: '20sp'
+                        size_hint: (1, 0.1)
+                        markup: True
+                
+                BoxLayout:
+                    orientation: 'horizontal'
+                    
+                    Button:
+                        id: motor_plus
+                        text: "+1Hz"
+                    Button:
+                        id: motor_minus
+                        text: "-1Hz"
+                Button:
+                    id: motor
+                    text: "START Motor"
+                    background_color: 0, 210/255, 0
+
+<Settings>:
+    name: "settings"
+    BoxLayout:
+        orientation: 'vertical'
+        
+        padding: 20
+        
+        TextInput:
+            id: hault_text
+            input_filter: 'float'
+            size: 100, 50
+            size_hint: 0.2, None 
+            height: 30
+            
+        Button:
+            id: hault_motor
+            size_hint: None, None
+            text: "START"
+            on_release: root.hault_motor()
+        Button:
+            id: hault_motor
+            size_hint: None, None
+            text: "Stop"
+            on_release: root.hault_stop()
+            
+        Button:
+            text: "Back"
+            size: 100, 50
+            size_hint: None, None
+            on_release: root.manager.current = 'mode'
+        
+<Plots>:
+    name: "plots"
+    Button:
+        text: "Back"
+        size_hint_y: 0.1
+        on_release: root.manager.current = "mode"
+
+<KeyboardScreen>:
+    name: "keyboard"
+    displayLabel: displayLabel
+    kbContainer: kbContainer
+    intr_temp: intr_temp
+    
+    BoxLayout:
+        orientation: 'vertical'
+        canvas:
+            Color:
+                rgb: 0x26/255.0, 0x32/255.0, 0x38/255.0
+            Rectangle:
+                size: self.size
+        
+        Label:
+            id: intr_temp
+            size_hint_y: 0.15
+            text: ""
+            font_size: "24sp"
+        BoxLayout:
+            id: kbContainer
+            size_hint_y: 0.2
+            orientation: "horizontal"
+            padding: 10
+
+        BoxLayout:
+            id: kbContainer
+            size_hint_y: 0.2
+            orientation: "horizontal"
+            padding: 10
+        Label:
+            id: displayLabel
+            size_hint_y: 0.15
+            markup: True
+            text: ""
+            halign: "center"
+            font_size: '23sp'
+        Widget:
+            # Just a space taker to allow for the popup keyboard
+            size_hint_y: 0.5

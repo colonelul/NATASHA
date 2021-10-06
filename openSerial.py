@@ -19,7 +19,7 @@ global serial_object
 devices_ids = {'CH340': {'VID': '1A86', 'PID': '7523'}}
 
 """Activate debug mode!"""
-debug = True
+debug = False
 
 def device_port(devicess):
     device_list = list_ports.comports()
@@ -67,11 +67,12 @@ def send(data):
     global serial_object
     try:
         serial_object.write(data)
-        if debug: print('DATA_SEND-> ' + str(data)) 
+        if debug: print('DATA_SEND-> ' + str(data))
+        return True
     except:
         if debug: print("Send data not working!") 
         else: pass
-    
+        return False
 
 
 

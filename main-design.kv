@@ -1,24 +1,115 @@
-<MainWindow, CreateWidget>:
+<MainWindow>:
     id: share_data
     name: "main"
     tempContainer: tempContainer
     
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint_y: 
+    GridLayout:
+        cols: 2
+        
         canvas:
             Color:
                 rgb: 0x26/255.0, 0x32/255.0, 0x38/255.0
             Rectangle:
                 size: self.size
-        GridLayout:
-            cols: 2
-            padding: 3
             
+        GridLayout:
+            id: left_screen
+            rows: 3
             Label:
                 id: clock
                 text: ""
                 font_size: self.width/10
+            
+            BoxLayout:
+                height: left_screen.height/5
+                size_hint: None, None
+            
+            GridLayout:
+                id:left_screen_bottom
+                rows: 2
+            
+                GridLayout:
+                    rows: 2
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        
+                        BoxLayout:
+                            id: bazin_rece
+                            orientation: 'vertical'
+                            padding: 20
+                            canvas:
+                                Color:
+                                    rgb: 0, 0, 130/255
+                                Rectangle:
+                                    size: bazin_rece.size
+                                    pos: bazin_rece.pos
+                            
+                            Label:
+                                text: '[b]Bazin apa rece[/b]'
+                                font_size: '20sp'
+                                size_hint: (1, 0.1)
+                                markup: True
+                            
+                            GridLayout:
+                                cols: 1
+                                padding: 20
+                                
+                                Label:
+                                    text: '0'
+                                    id: bazin_rece-lab
+                        
+                        BoxLayout:
+                            id: bazin_cald
+                            orientation: 'vertical'
+                            canvas:
+                                Color:
+                                    rgb: 130/255, 0, 0
+                                Rectangle:
+                                    size: self.size
+                                    pos: self.pos
+                            
+                            padding: 20
+                            
+                            Label:
+                                text: '[b]Bazin apa calda[/b]'
+                                font_size: '20sp'
+                                size_hint: (1, 0.1)
+                                markup: True
+                            
+                            GridLayout:
+                                cols: 2
+                                padding: 20
+                                
+                                Label:
+                                    text: '0'
+                                    id: bazinCald_lab
+                                    
+                                TextInput:
+                                    id: bazinCald_text
+                                    size_hint: .8, None 
+                                    height: 30
+                                    input_filter: 'float'
+        
+                GridLayout:
+                    rows: 2
+                    GridLayout:
+                        cols: 10
+                        canvas:
+                            Color:
+                                rgb: 217/255, 176/255, 46/255
+                            Rectangle:
+                                size: self.size
+                                pos: self.pos
+                        id: tempContainer
+                    Button:
+                        id: heaters
+                        size_hint: 0.3, 0.35
+                        text: "START Incalzire"
+                        background_color: 0, 210/255, 0
+        BoxLayout:
+            id: right_screen
+            orientation: 'vertical'
+            padding: 10
             
             BoxLayout:
                 id: block
@@ -53,141 +144,75 @@
                         markup: True
                         
                     Label:
-                        id: dFilament_camera
+                        id: filament_camera
                         text: "[b]Dimensiune filament(Camera):[/b]"
                         font_size: '20sp'
                         size_hint: (1, 0.1)
                         markup: True
             
-        GridLayout:
-            cols: 2
-            padding: 3
-        
-            GridLayout:
-                cols: 1
-                BoxLayout:
-                    size_hint: 0.3, 0.26
-                    orientation: 'horizontal'
-                    
-                    BoxLayout:
-                        id: bazin_rece
-                        orientation: 'vertical'
-                        canvas:
-                            Color:
-                                rgb: 0, 0, 130/255
-                            Rectangle:
-                                size: self.size
-                                pos: self.pos
-                        
-                        padding: 20
-                        
-                        Label:
-                            text: '[b]Bazin apa rece[/b]'
-                            font_size: '20sp'
-                            size_hint: (1, 0.1)
-                            markup: True
-                        
-                        GridLayout:
-                            cols: 1
-                            padding: 20
-                            
-                            Label:
-                                text: '0'
-                                id: bazin_rece-lab
-                    
-                    BoxLayout:
-                        id: bazin_cald
-                        orientation: 'vertical'
-                        canvas:
-                            Color:
-                                rgb: 130/255, 0, 0
-                            Rectangle:
-                                size: self.size
-                                pos: self.pos
-                        
-                        padding: 20
-                        
-                        Label:
-                            text: '[b]Bazin apa calda[/b]'
-                            font_size: '20sp'
-                            size_hint: (1, 0.1)
-                            markup: True
-                        
-                        GridLayout:
-                            cols: 2
-                            padding: 20
-                            
-                            Label:
-                                text: '0'
-                                id: bazinCald_lab
-                                
-                            TextInput:
-                                id: bazinCald_text
-                                size_hint: .8, None 
-                                height: 30
-                                input_filter: 'float'
-        
-                BoxLayout:
-                    height: 300
-                    orientation: 'horizontal'
-                    canvas:
-                        Color:
-                            rgb: 217/255, 176/255, 46/255
-                        Rectangle:
-                            size: self.size
-                            pos: self.pos
-                    
-                    GridLayout:
-                        cols: 10
-                        id: tempContainer
             BoxLayout:
-                orientation: 'vertical'
-                
-                Button:
-                    id: heaters
-                    text: "START Incalzire"
-                    background_color: 0, 210/255, 0
-                
-                BoxLayout:
-                    orientation: 'horizontal'
-                    
-                    padding: 20
-                    
-                    TextInput:
-                        id: hz_text
-                        input_filter: 'float'
-                        size_hint: .8, None 
-                        height: 30
+                orientation: 'horizontal'
+                height: 40
+                width: right_screen.width
+                size_hint: None, None
 
-                    Label:
-                        id: hz_label
-                        text: '0Hz'
-                        font_size: '20sp'
-                        size_hint: (1, 0.1)
-                        markup: True
-                
-                BoxLayout:
-                    orientation: 'horizontal'
-                    
-                    Button:
-                        id: motor_plus
-                        text: "+1Hz"
-                    Button:
-                        id: motor_minus
-                        text: "-1Hz"
-                Button:
-                    id: motor
-                    text: "START Motor"
-                    background_color: 0, 210/255, 0
-                    on_release: root.motor_run()
+                TextInput:
+                    id: hz_text
+                    input_filter: 'float'
+                    height: 30
 
+                Label:
+                    id: hz_label
+                    text: '0Hz'
+                    font_size: '20sp'
+                    markup: True
+                    
+                Button:
+                    id: motor_plus
+                    text: "+1Hz"
+                Button:
+                    id: motor_minus
+                    text: "-1Hz"
+            Button:
+                id: motor
+                size_hint: 1, 0.10
+                text: "START Motor"
+                background_color: 0, 210/255, 0
 <Settings>:
     name: "settings"
-    Button:
-        text: "Back"
-        size_hint_y: 0.1
-        on_release: root.dada()
-    
+    canvas:
+        Color:
+            rgb: 0x26/255.0, 0x32/255.0, 0x38/255.0
+        Rectangle:
+            size: self.size
+    GridLayout:
+        cols: 1
+        padding: 20
+        
+        TextInput:
+            id: hault_text
+            input_filter: 'float'
+            size: 100, 50
+            size_hint: None, None 
+            height: 30
+            
+        Button:
+            id: hault_motor
+            size_hint: None, None
+            text: "START"
+            on_release: root.hault_motor()
+        Button:
+            id: hault_motor
+            size_hint: None, None
+            text: "Stop"
+            on_release: root.hault_stop()
+            
+        Button:
+            text: "Back"
+            size: 100, 50
+            size_hint: None, None
+            on_release: root.manager.current = 'mode'
+        
 <Plots>:
     name: "plots"
     Button:

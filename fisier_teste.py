@@ -92,9 +92,13 @@ print(m[0]*pixelsPermm)
 print(m[-1]*pixelsPermm)
 print(m[int(len(m)/2)]*pixelsPermm)
 
-cv2.imshow("Image", edged)
+cv2.imshow("Image",edged)
 if cv2.waitKey(0) & 0xFF == ord('q'): 
     cv2.destroyAllWindows()
+
+
+
+
 
 b = '010302457'
 
@@ -104,10 +108,11 @@ devices_adress = {'laser': '01', 'hault': '02', 'motor_natasha': '03'}
 
 devices_adress['laser']
 
-t1 = 
-t2 = 20104
+t = True
+if not(t):
+    print('da')
 
-print(t2 >> 8)
+
 
 
 print(bytearray([0x2, 0x6, 0x04, 0x0E, 0x00, 0x00]))
