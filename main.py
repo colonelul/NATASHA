@@ -16,7 +16,6 @@ from kivy.config import Config
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-from kivy.uix.image import Image
 from kivy.graphics.texture import Texture
 from SaveFile import ImportFile
 from keyboard import KeyboardScreen

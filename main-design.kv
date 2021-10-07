@@ -2,74 +2,113 @@
     id: share_data
     name: "main"
     tempContainer: tempContainer
-    
-    GridLayout:
-        cols: 2
-        
-        canvas:
-            Color:
-                rgb: 0x26/255.0, 0x32/255.0, 0x38/255.0
-            Rectangle:
-                size: self.size
+    canvas:
+        Color:
+            rgb: 54/255, 55/255, 64/255
+        Rectangle:
+            size: self.size
             
+    GridLayout:
+        id: left_screen
+        rows: 3
+        padding: 10
+        
         GridLayout:
-            id: left_screen
-            rows: 3
+            id: block
+            cols: 2
+            
             Label:
                 id: clock
                 text: ""
-                font_size: self.width/10
+                font_size: left_screen.width/10
+        
+            GridLayout:
+                cols: 1
+                col_force_default: True
+                col_default_width: 30
+                row_force_default: True
+                row_default_height: 30
+                Button:
+                    text: "p"
+                    on_release: root.manager.current = 'plots'
+                Button:
+                    text: "s"
+                    on_release: root.manager.current = 'settings'
+
+        BoxLayout:
+            height: left_screen.height/5
+            size_hint: None, None
             
-            BoxLayout:
-                height: left_screen.height/5
-                size_hint: None, None
-            
+            Image:
+                id: camera
+                size: block.size
+        
+        GridLayout:
+            cols: 2
             GridLayout:
                 id:left_screen_bottom
-                rows: 2
-            
+                rows: 3
+                padding: (3,3,3,0)
+                canvas:
+                    Color:
+                        rgb: 26/255.0, 32/255.0, 38/255.0
+                    Rectangle:
+                        size: left_screen_bottom.size
+                        pos: left_screen_bottom.pos
                 GridLayout:
-                    rows: 2
+                    cols:2
+                    height:left_screen_bottom.height/5
+                    size_hint: 1, None
+                    
                     BoxLayout:
-                        orientation: 'horizontal'
+                        id: bazin_rece
+                        padding: 5
+                        canvas:
+                            Color:
+                                rgb: 0, 0, 50/255
+                            Rectangle:
+                                size: bazin_rece.size
+                                pos: bazin_rece.pos
                         
-                        BoxLayout:
-                            id: bazin_rece
-                            orientation: 'vertical'
-                            padding: 20
+                        GridLayout:
+                            cols: 1
+                            padding: 10
                             canvas:
                                 Color:
                                     rgb: 0, 0, 130/255
                                 Rectangle:
-                                    size: bazin_rece.size
-                                    pos: bazin_rece.pos
-                            
+                                    size: bazin_rece.width/1.03, bazin_rece.height/1.1
+                                    pos: bazin_rece.x + bazin_rece.width/70, bazin_rece.y + bazin_rece.width/90        
                             Label:
                                 text: '[b]Bazin apa rece[/b]'
                                 font_size: '20sp'
                                 size_hint: (1, 0.1)
                                 markup: True
-                            
-                            GridLayout:
-                                cols: 1
-                                padding: 20
-                                
-                                Label:
-                                    text: '0'
-                                    id: bazin_rece-lab
+                             
+                            Label:
+                                id: bazin_rece-lab
+                                text: 'Temperatura: 0*C'
+                                valign: 'middle'
+                    
+                    BoxLayout:
+                        id: bazin_cald
+                        padding: 5
+                        canvas:
+                            Color:
+                                rgb: 50/255, 0, 0
+                            Rectangle:
+                                size: bazin_cald.size
+                                pos: bazin_cald.pos
                         
-                        BoxLayout:
-                            id: bazin_cald
-                            orientation: 'vertical'
+                        GridLayout:
+                            cols: 1
+                            padding: 10
                             canvas:
                                 Color:
                                     rgb: 130/255, 0, 0
                                 Rectangle:
-                                    size: self.size
-                                    pos: self.pos
-                            
-                            padding: 20
-                            
+                                    size: bazin_cald.width/1.03, bazin_cald.height/1.1
+                                    pos: bazin_cald.x + bazin_cald.width/70, bazin_cald.y + bazin_cald.width/90
                             Label:
                                 text: '[b]Bazin apa calda[/b]'
                                 font_size: '20sp'
@@ -78,59 +117,44 @@
                             
                             GridLayout:
                                 cols: 2
-                                padding: 20
-                                
                                 Label:
-                                    text: '0'
-                                    id: bazinCald_lab
-                                    
+                                    id: bazinCald_lab  
+                                    text: 'Temperatura: 0*C'
+                                    valign: 'middle'
                                 TextInput:
                                     id: bazinCald_text
-                                    size_hint: .8, None 
                                     height: 30
+                                    size_hint: .8, None 
                                     input_filter: 'float'
-        
                 GridLayout:
-                    rows: 2
-                    GridLayout:
-                        cols: 10
-                        canvas:
-                            Color:
-                                rgb: 217/255, 176/255, 46/255
-                            Rectangle:
-                                size: self.size
-                                pos: self.pos
-                        id: tempContainer
+                    cols: 10
+                    id: tempContainer
+                    canvas:
+                        Color:
+                            rgb: 148/255, 149/255, 156/255
+                        Rectangle:
+                            size: tempContainer.size
+                            pos: tempContainer.pos
+                BoxLayout:
+                    id: box_start_hit
+                    height:left_screen_bottom.height/6
+                    size_hint: 1, None
+                    padding: 10
                     Button:
                         id: heaters
-                        size_hint: 0.3, 0.35
                         text: "START Incalzire"
                         background_color: 0, 210/255, 0
-        BoxLayout:
-            id: right_screen
-            orientation: 'vertical'
-            padding: 10
-            
-            BoxLayout:
-                id: block
-                orientation: 'vertical'
-            
-                GridLayout:
-                    cols: 1
-                    col_force_default: True
-                    col_default_width: 30
-                    row_force_default: True
-                    row_default_height: 30
-                    Button:
-                        text: "p"
-                        on_release: root.manager.current = 'plots'
-                    Button:
-                        text: "s"
-                        on_release: root.manager.current = 'settings'
-                Image:
-                    id: camera
-                    size: block.size
-                    
+                        border: (1,1,1,1)
+            GridLayout:
+                id:right_screen_bottom
+                rows: 3
+                padding: (3,3,3,0)
+                canvas:
+                    Color:
+                        rgb: 26/255.0, 32/255.0, 38/255.0
+                    Rectangle:
+                        size: right_screen_bottom.size
+                        pos: right_screen_bottom.pos
                 GridLayout:
                     cols:2
                     row_force_default: True
@@ -150,34 +174,37 @@
                         size_hint: (1, 0.1)
                         markup: True
             
-            BoxLayout:
-                orientation: 'horizontal'
-                height: 40
-                width: right_screen.width
-                size_hint: None, None
-
-                TextInput:
-                    id: hz_text
-                    input_filter: 'float'
-                    height: 30
-
-                Label:
-                    id: hz_label
-                    text: '0Hz'
-                    font_size: '20sp'
-                    markup: True
-                    
-                Button:
-                    id: motor_plus
-                    text: "+1Hz"
-                Button:
-                    id: motor_minus
-                    text: "-1Hz"
-            Button:
-                id: motor
-                size_hint: 1, 0.10
-                text: "START Motor"
-                background_color: 0, 210/255, 0
+                BoxLayout:
+                    orientation: 'horizontal'
+                    height: 40
+                    size_hint: 1, None
+        
+                    TextInput:
+                        id: hz_text
+                        input_filter: 'float'
+                        height: 30
+        
+                    Label:
+                        id: hz_label
+                        text: '0Hz'
+                        font_size: '20sp'
+                        markup: True
+                        
+                    Button:
+                        id: motor_plus
+                        text: "+1Hz"
+                    Button:
+                        id: motor_minus
+                        text: "-1Hz"
+                BoxLayout:
+                    height:left_screen_bottom.height/6
+                    size_hint: 1, None
+                    padding: 10
+                    Button:
+                        id: motor
+                        text: "START Motor"
+                        background_color: 0, 210/255, 0
+                        border: (1,1,1,1)
 <Settings>:
     name: "settings"
     canvas:
