@@ -9,55 +9,93 @@
             size: self.size
             
     GridLayout:
-        id: left_screen
+        id: screen
         rows: 3
         padding: 10
         
-        GridLayout:
-            id: block
-            cols: 2
-            
-            Label:
-                id: clock
-                text: ""
-                font_size: left_screen.width/10
-        
-            GridLayout:
-                cols: 1
-                col_force_default: True
-                col_default_width: 30
-                row_force_default: True
-                row_default_height: 30
-                Button:
-                    text: "p"
-                    on_release: root.manager.current = 'plots'
-                Button:
-                    text: "s"
-                    on_release: root.manager.current = 'settings'
-
         BoxLayout:
-            height: left_screen.height/5
-            size_hint: None, None
+            id: screen_top
+            orientation: 'horizontal'
+            height: screen.height/6
+            size_hint: 1, None
+
+            BoxLayout:
+                canvas:
+                    Color:
+                        rgb: 2/255, 8/255, 18/255
+                    RoundedRectangle:
+                        size: screen_top.width/2 - 100, screen_top.height - 80
+                        pos: screen_top.x + 50, screen_top.y + 40
+                        radius: [(20, 20), (20, 20), (20, 20), (20, 20)]
+                BoxLayout
+                    canvas.before:
+                        Color:
+                            rgb: 25/255, 35/255, 51/255
+                        RoundedRectangle:
+                            size: screen_top.width/2 - 110, screen_top.height - 90
+                            pos: screen_top.x + 55, screen_top.y + 45
+                            radius: [(20, 20), (20, 20), (20, 20), (20, 20)]
+                
+                    Label:
+                        id: clock
+                        text: ""
+                        font_size: '40sp'
+                        font_name: 'Z:/NATASHA/NATASHA_RASPBERRY/Font-style/font_1.ttf'
+        
+            BoxLayout:
+                id: panel_right
+                orientation: 'vertical'
+                Button:
+                    id: plots
+                    on_release: root.manager.current = 'plots'
+                    size: 50, 50
+                    size_hint: None, None
+                    pos_hint: {'x': 0.92}
+                    Image:
+                        source: 'Z:/NATASHA/NATASHA_RASPBERRY/Images/plots.png'
+                        size: 42, 42
+                        center_x: plots.center_x
+                        center_y: plots.center_y
+                
+                Button:
+                    id: settings
+                    on_release: root.manager.current = 'settings'
+                    size: 50, 50
+                    size_hint: None, None
+                    pos_hint: {'x': 0.92}
+                    Image:
+                        source: 'Z:/NATASHA/NATASHA_RASPBERRY/Images/settings.png'
+                        size: 42, 42
+                        center_x: settings.center_x
+                        center_y: settings.center_y
+
+        GridLayout:
+            id: middle
+            cols: 2
+            BoxLayout:
+                height: screen.height/5
+                width: screen.width/2
+                size_hint: None, None
             
             Image:
                 id: camera
-                size: block.size
+                size: middle.width/2, middle.height/2
         
         GridLayout:
             cols: 2
             GridLayout:
-                id:left_screen_bottom
+                id:screen_bottom
                 rows: 3
                 padding: (3,3,3,0)
                 canvas:
                     Color:
                         rgb: 26/255.0, 32/255.0, 38/255.0
                     Rectangle:
-                        size: left_screen_bottom.size
-                        pos: left_screen_bottom.pos
+                        size: screen_bottom.size
+                        pos: screen_bottom.pos
                 GridLayout:
                     cols:2
-                    height:left_screen_bottom.height/5
+                    height:screen_bottom.height/5
                     size_hint: 1, None
                     
                     BoxLayout:
@@ -137,7 +175,7 @@
                             pos: tempContainer.pos
                 BoxLayout:
                     id: box_start_hit
-                    height:left_screen_bottom.height/6
+                    height:screen_bottom.height/6
                     size_hint: 1, None
                     padding: 10
                     Button:
@@ -157,8 +195,8 @@
                         pos: right_screen_bottom.pos
                 GridLayout:
                     cols:2
-                    row_force_default: True
-                    row_default_height: 300
+                    height:screen_bottom.height/5
+                    size_hint: 1, None
                     
                     Label:
                         id: dFilament_laser
@@ -173,31 +211,58 @@
                         font_size: '20sp'
                         size_hint: (1, 0.1)
                         markup: True
-            
+                
                 BoxLayout:
-                    orientation: 'horizontal'
-                    height: 40
-                    size_hint: 1, None
-        
-                    TextInput:
-                        id: hz_text
-                        input_filter: 'float'
-                        height: 30
-        
-                    Label:
-                        id: hz_label
-                        text: '0Hz'
-                        font_size: '20sp'
-                        markup: True
+                    id: button_right
+                    height: right_screen_bottom.height/1.6
+                    size_hint:1, None
+                
+                    GridLayout:
+                        cols: 3
+                        height: button_right.height/4
+                        size_hint:1, None
                         
-                    Button:
-                        id: motor_plus
-                        text: "+1Hz"
-                    Button:
-                        id: motor_minus
-                        text: "-1Hz"
+                        Button:
+                            id: motor_plus
+                            text: "+1Hz"
+                            size_hint: .4, .4
+                        Button:
+                            id: motor_minus
+                            text: "-1Hz"
+                            size_hint: .4, .4
+                        
+                        GridLayout:
+                            cols: 2
+                            BoxLayout:
+                                orientation: 'vertical'
+                                TextInput:
+                                    id: hz_text
+                                    input_filter: 'float'
+                                    height: 30
+                                    size_hint: 1, None
+                                
+                                Label:
+                                    id:amp
+                                    text: "[b]Amperajul este:[/b]"
+                                    font_size: '20sp'
+                                    size_hint: (1, 0.1)
+                                    markup: True
+                            BoxLayout:
+                                orientation: 'vertical'
+                                Label:
+                                    id: hz_label
+                                    text: '0Hz'
+                                    font_size: '20sp'
+                                    markup: True
+                                
+                                Label:
+                                    id: amp_label
+                                    text: '0A'
+                                    font_size: '20sp'
+                                    markup: True
+                            
                 BoxLayout:
-                    height:left_screen_bottom.height/6
+                    height:screen_bottom.height/6
                     size_hint: 1, None
                     padding: 10
                     Button:
@@ -206,6 +271,7 @@
                         background_color: 0, 210/255, 0
                         border: (1,1,1,1)
 <Settings>:
+    id: screen_settings
     name: "settings"
     canvas:
         Color:
@@ -213,32 +279,50 @@
         Rectangle:
             size: self.size
     GridLayout:
-        cols: 1
-        padding: 20
+        rows:1
         
-        TextInput:
-            id: hault_text
-            input_filter: 'float'
-            size: 100, 50
-            size_hint: None, None 
-            height: 30
+        BoxLayout:
+            id: control_motor
+            orientation: 'vertical'
+            padding: 20
+            height: screen_settings.height/3
+            width: screen_settings.width/4
+            size_hint: None, None
             
-        Button:
-            id: hault_motor
-            size_hint: None, None
-            text: "START"
-            on_release: root.hault_motor()
-        Button:
-            id: hault_motor
-            size_hint: None, None
-            text: "Stop"
-            on_release: root.hault_stop()
-            
-        Button:
-            text: "Back"
-            size: 100, 50
-            size_hint: None, None
-            on_release: root.manager.current = 'mode'
+            GridLayout:
+                rows:4
+                Label:
+                    text: "[b]Controlul motorului pentru tragerea filamentului[/b]"
+                    markup: True
+                BoxLayout:
+                    orientation: 'horizontal'
+                    Label:
+                        text: "RPM:"
+                        markup: True
+                    
+                    TextInput:
+                        id: hault_text
+                        input_filter: 'float'
+                        size: 100, 40
+                        size_hint: None, None 
+                
+                BoxLayout:
+                    orientation: 'horizontal'
+                    height: control_motor.height/7
+                    size_hint: 1, None
+                    Button:
+                        id: hault_motor
+                        text: "Stop"
+                        on_release: root.hault_stop()
+                        
+                    Button:
+                        id: hault_motor
+                        text: "START"
+                        on_release: root.hault_motor()
+                    
+                Button:
+                    text: "Back"
+                    on_release: root.manager.current = 'mode'
         
 <Plots>:
     name: "plots"

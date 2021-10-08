@@ -93,13 +93,12 @@ class MainWindow(Screen):
     def update_camera(self):
         try:
             ret, frame = self.capture.read()
+            buf = cv2.flip(frame, 0).tostring()
             try:
                 cc = MeasuringObject().process_image(frame)
-                #self.ids.filament_camera.text = cc
+                self.ids.filament_camera.text = cc
             except:
                 pass
-            
-            buf = cv2.flip(frame, 0).tostring()
             
             texture = Texture.create(size=(frame.shape[1], frame.shape[0]))
             texture.blit_buffer(buf, bufferfmt="ubyte")
@@ -143,7 +142,7 @@ class MainWindow(Screen):
             if len(self.ids[txt_focuses].text) > 0 and value:
                 self.ids[txt_focuses].text = ""
             
-            ImportFile().export_file(txt_focuses[0 : txt_focuses.find("_")], self.ids[txt_focuses[0 : txt_focuses.find("_")] + "_lab"].text)
+            #ImportFile().export_file(txt_focuses[0 : txt_focuses.find("_")], self.ids[txt_focuses[0 : txt_focuses.find("_")] + "_lab"].text)
                 
     def _create_widgets(self):
         
@@ -173,6 +172,7 @@ class MainWindow(Screen):
         self.ids.motor.bind(state=self.buttons_listen)
         self.ids.motor_plus.bind(state=self.buttons_listen)
         self.ids.motor_minus.bind(state=self.buttons_listen)
+        self.ids.hz_text.bind(focus=self.on_focus)
         
         self.change_text_onStart(None)
         
@@ -303,7 +303,7 @@ class RS485:
         self.send_array[status][7] = hhh
         
         if openSerial.send(bytearray(self.send_array[status])):
-            print(self.send_array[status])
+            #print(self.send_array[status])
             return True
             
     def RS485_onStart(self, index):

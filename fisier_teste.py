@@ -47,7 +47,7 @@ devices_ids = {'CH340': {'VID': '1A86', 'PID': '7523'},
 devices_ids['CH340']['VID']
 
 
-imgg = 'Z:/NATASHA/Camera/1.jpg'
+imgg = 'Z:/NATASHA/NATASHA_RASPBERRY/1.jpg'
 
 import cv2
 import numpy as np
@@ -76,8 +76,8 @@ cnts = imutils.grab_contours(cnts)
 cnts = sorted(cnts, key=cv2.contourArea, reverse=False)[:5]
 
 cc = [[],[]]
-cc[0] = cnts[2]
-cc[1] = cnts[1]
+cc[0] = cnts[0]
+cc[1] = cnts[-1]
 
 a = np.empty(len(cc[0]))
 b = np.empty(len(cc[0]))

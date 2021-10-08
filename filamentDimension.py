@@ -49,8 +49,8 @@ class MeasuringObject():
         
         cc = [[],[]]
         try:    
-            cc[0] = cnts[2]
-            cc[1] = cnts[1]
+            cc[0] = cnts[0]
+            cc[1] = cnts[-1]
         except:
             pass
         
@@ -73,4 +73,7 @@ class MeasuringObject():
         
         center = m[int(len(m)/2)]*self.pixelsPermm
         
-        return center
+        return 
+    
+    
+MeasuringObject().process_image('Z:/NATASHA/Camera/1.jpg')
